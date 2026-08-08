@@ -19,6 +19,9 @@
 <meta name="twitter:title" content="Moi, Président">
 <meta name="twitter:description" content="France 2027–2034 : 30 piliers, 300 mesures, chiffrées pilier par pilier.">
 <meta name="twitter:image" content="og-image.jpg">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Instrument+Sans:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
   /* Marianne — official French government typeface (via DSFR) */
   @font-face {
@@ -216,9 +219,54 @@
   }
 
   ::selection { background: #161616; color: #fff; }
+
+  /* intro / typewriter */
+  .intro {
+    position: fixed; inset: 0; z-index: 100;
+    background: var(--paper);
+    background-image: radial-gradient(ellipse at 50% 45%, #ffffff 0%, var(--paper) 62%, #edece7 100%);
+    display: flex; align-items: center; justify-content: center;
+    padding: 40px;
+    transition: opacity 0.9s ease, visibility 0.9s;
+  }
+  .intro.done { opacity: 0; visibility: hidden; pointer-events: none; }
+  .intro-text {
+    font-size: clamp(22px, 3.4vw, 40px);
+    line-height: 1.3; letter-spacing: -0.02em;
+    color: var(--ink); max-width: 18em;
+  }
+  .intro-text .l1 {
+    font-family: "Instrument Sans", "Marianne", Helvetica, Arial, sans-serif;
+    font-weight: 600; margin-bottom: 1.15em;
+  }
+  .intro-text .l2 { font-weight: 500; }
+  .cur {
+    display: none; width: 0.06em; height: 1em; margin-left: 0.04em;
+    background: var(--ink); vertical-align: -0.12em;
+    animation: blink 1s steps(1) infinite;
+  }
+  .cur.on { display: inline-block; }
+  @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
+
+  /* everything behind the intro fades in once it clears.
+     Faded per-element, not via a wrapper: an ancestor with opacity < 1 would
+     become the containing block for these position:fixed children. */
+  .frame, .masthead, .lang, .sources, .counter, #scene, #tags {
+    transition: opacity 0.9s ease;
+  }
+  body.booting .frame, body.booting .masthead, body.booting .lang,
+  body.booting .sources, body.booting .counter,
+  body.booting #scene, body.booting #tags { opacity: 0; }
 </style>
 </head>
-<body>
+<body class="booting">
+  <div class="intro" id="intro">
+    <div class="intro-text">
+      <div class="l1"><span id="t1"></span><span class="cur" id="c1"></span></div>
+      <div class="l2"><span id="t2"></span><span class="cur" id="c2"></span></div>
+    </div>
+  </div>
+
   <span class="frame tl">1</span>
   <header class="masthead">
     <div class="m-kicker">France 2027–2034</div>
@@ -1331,6 +1379,50 @@ function frame(now) {
 applyLang(lang);
 setCounter(UI[lang].total, TOTAL, false, TOTAL_GAIN);
 requestAnimationFrame(frame);
+
+// ---- intro: typewriter, hold 3s, then reveal the sphere ----
+(function intro() {
+  const L1 = "Claude,";
+  const L2 = "que ferais-tu si tu étais élu président en 2027 ?";
+  const SPEED = 52, HOLD = 3000;
+  const introEl = document.getElementById("intro");
+  const t1 = document.getElementById("t1"), t2 = document.getElementById("t2");
+  const c1 = document.getElementById("c1"), c2 = document.getElementById("c2");
+  let done = false;
+  const timers = [];
+
+  function reveal() {
+    if (done) return;
+    done = true;
+    timers.forEach(clearTimeout);
+    c1.classList.remove("on"); c2.classList.remove("on");
+    introEl.classList.add("done");
+    document.body.classList.remove("booting");
+  }
+
+  function type(el, cur, text, then) {
+    cur.classList.add("on");
+    let i = 0;
+    (function step() {
+      if (done) return;
+      el.textContent = text.slice(0, ++i);
+      if (i < text.length) timers.push(setTimeout(step, SPEED));
+      else { cur.classList.remove("on"); then(); }
+    })();
+  }
+
+  // let an impatient visitor skip straight through
+  ["click", "keydown", "touchstart"].forEach(ev =>
+    introEl.addEventListener(ev, reveal, { once: true }));
+
+  timers.push(setTimeout(() =>
+    type(t1, c1, L1, () =>
+      timers.push(setTimeout(() =>
+        type(t2, c2, L2, () =>
+          timers.push(setTimeout(reveal, HOLD))
+        ), 420))
+    ), 500));
+})();
 </script>
 </body>
 </html>
