@@ -3,8 +3,40 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>France 2027–2034 — Programme</title>
+<title>Moi, Président</title>
+<meta name="description" content="France 2027–2034 : 30 piliers, 300 mesures, chiffrées pilier par pilier.">
+
+<link rel="icon" type="image/png" sizes="180x180" href="favicon.png">
+<link rel="apple-touch-icon" href="favicon.png">
+
+<meta property="og:type" content="website">
+<meta property="og:title" content="Moi, Président">
+<meta property="og:description" content="France 2027–2034 : 30 piliers, 300 mesures, chiffrées pilier par pilier.">
+<meta property="og:image" content="og-image.jpg">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Moi, Président">
+<meta name="twitter:description" content="France 2027–2034 : 30 piliers, 300 mesures, chiffrées pilier par pilier.">
+<meta name="twitter:image" content="og-image.jpg">
 <style>
+  /* Marianne — official French government typeface (via DSFR) */
+  @font-face {
+    font-family: "Marianne";
+    src: url("https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.12.1/dist/fonts/Marianne-Regular.woff2") format("woff2");
+    font-weight: 400; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: "Marianne";
+    src: url("https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.12.1/dist/fonts/Marianne-Medium.woff2") format("woff2");
+    font-weight: 500; font-style: normal; font-display: swap;
+  }
+  @font-face {
+    font-family: "Marianne";
+    src: url("https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.12.1/dist/fonts/Marianne-Bold.woff2") format("woff2");
+    font-weight: 600 700; font-style: normal; font-display: swap;
+  }
+
   * { margin: 0; padding: 0; box-sizing: border-box; }
   :root {
     --ink: #161616;
@@ -17,7 +49,7 @@
     background: var(--paper);
     background-image: radial-gradient(ellipse at 50% 42%, #ffffff 0%, var(--paper) 62%, #edece7 100%);
     color: var(--ink);
-    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-family: "Marianne", "Helvetica Neue", Helvetica, Arial, sans-serif;
     -webkit-font-smoothing: antialiased;
     line-height: 1.5;
     letter-spacing: -0.01em;
@@ -26,9 +58,65 @@
   /* corner frame */
   .frame { position: fixed; font-size: 10px; color: var(--mute); letter-spacing: 0.05em; z-index: 40; pointer-events: none; }
   .frame.tl { top: 30px; left: 36px; }
-  .frame.tc { top: 30px; left: 50%; transform: translateX(-50%); }
-  .frame.bl { bottom: 30px; left: 36px; }
-  .frame.bc { bottom: 30px; left: 50%; transform: translateX(-50%); }
+
+  /* masthead — kicker above, big title below */
+  .masthead {
+    position: fixed; top: 26px; left: 50%; transform: translateX(-50%);
+    text-align: center; z-index: 40; pointer-events: none;
+  }
+  .masthead .m-kicker {
+    font-size: 10px; color: var(--mute); letter-spacing: 0.08em;
+    text-transform: uppercase; margin-bottom: 5px;
+  }
+  .masthead .m-title {
+    font-family: "Marianne", "Helvetica Neue", Helvetica, Arial, sans-serif;
+    font-size: 26px; font-weight: 600; letter-spacing: -0.02em;
+    color: #111111; line-height: 1.1;
+  }
+  @media (max-width: 1020px) {
+    .masthead { left: 36px; transform: none; text-align: left; }
+    .frame.tl { display: none; }
+    .masthead .m-title { font-size: 21px; }
+  }
+
+  /* language toggle */
+  .lang {
+    position: fixed; bottom: 30px; left: 36px; z-index: 60;
+    background: none; border: none; cursor: pointer;
+    font-family: inherit; font-size: 11px; letter-spacing: 0.08em;
+    color: var(--ink); padding: 4px 0;
+    border-bottom: 1px solid transparent;
+  }
+  .lang:hover { border-bottom-color: var(--ink); }
+
+  /* sources */
+  .sources { position: fixed; bottom: 30px; right: 36px; z-index: 60; }
+  .sources .s-btn {
+    font-family: inherit; font-size: 11px; letter-spacing: 0.08em;
+    color: var(--ink); padding: 4px 0; cursor: default;
+    border-bottom: 1px solid transparent;
+  }
+  .sources:hover .s-btn { border-bottom-color: var(--ink); }
+  .sources .s-pop {
+    position: absolute; bottom: 26px; right: 0; width: 330px;
+    background: var(--paper); border: 1px solid var(--line);
+    padding: 16px 18px; text-align: left;
+    opacity: 0; visibility: hidden; transform: translateY(4px);
+    transition: opacity 0.2s ease, transform 0.2s ease, visibility 0.2s;
+    max-height: 60vh; overflow-y: auto;
+  }
+  .sources:hover .s-pop { opacity: 1; visibility: visible; transform: translateY(0); }
+  .s-pop h4 {
+    font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--mute); font-weight: 500; margin-bottom: 8px;
+  }
+  .s-pop h4:not(:first-child) { margin-top: 14px; }
+  .s-pop ul { list-style: none; }
+  .s-pop li { font-size: 11px; line-height: 1.5; color: #3a3733; padding: 2px 0; }
+  .s-pop .note {
+    font-size: 10px; line-height: 1.5; color: var(--mute);
+    margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line);
+  }
 
   /* canvas + label layer */
   #scene { position: fixed; inset: 0; cursor: grab; }
@@ -60,30 +148,29 @@
     overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
   }
   .counter.pillar .c-label { color: var(--ink); }
-  .counter .c-value {
-    font-size: 24px; font-weight: 600; letter-spacing: -0.02em;
-    font-variant-numeric: tabular-nums; line-height: 1;
+  .counter.hidden { opacity: 0; pointer-events: none; }
+  .counter { transition: opacity 0.25s ease; }
+  .g-row { margin-top: 8px; }
+  .g-tag {
+    display: block; font-size: 8.5px; letter-spacing: 0.07em;
+    text-transform: uppercase; color: var(--mute); margin-bottom: 3px;
   }
-  .counter .c-value .c-unit { font-size: 11px; color: var(--mute); font-weight: 400; margin-left: 5px; }
   .counter .gauge {
-    margin-top: 12px; height: 34px; border-radius: 9px;
+    height: 30px; border-radius: 8px;
     background: rgba(0,0,0,0.045); border: 1px solid var(--line);
     position: relative; overflow: hidden;
     display: flex; align-items: center; justify-content: flex-end;
   }
   .counter .gauge .fill {
     position: absolute; top: 0; left: 0; height: 100%;
-    background: #ddd9d0; border-radius: 9px; min-width: 8px;
+    background: #ddd9d0; border-radius: 8px; min-width: 6px;
     transition: width 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
-  .counter .gauge .fill::after {
-    content: ""; position: absolute; right: 0; top: 50%;
-    transform: translateY(-50%); width: 2px; height: 60%;
-    background: #b3afa6; border-radius: 2px;
-  }
+  .counter .gauge.gain .fill { background: #cfd6cd; }
   .counter .gauge .g-max {
     position: relative; z-index: 1; padding-right: 12px;
-    font-size: 12px; color: #8f8f8f; font-variant-numeric: tabular-nums;
+    font-size: 12px; font-weight: 500; color: #57544c; font-variant-numeric: tabular-nums;
+    white-space: nowrap;
   }
   .counter .c-foot { margin-top: 6px; font-size: 9px; color: var(--mute); }
 
@@ -94,13 +181,13 @@
     backdrop-filter: blur(6px);
     border-left: 1px solid var(--line);
     z-index: 50; overflow-y: auto;
-    padding: 128px 34px 44px;
+    padding: 190px 34px 44px;
     transform: translateX(102%);
     transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
   .panel.open { transform: translateX(0); }
   .panel .close {
-    position: absolute; top: 92px; right: 30px;
+    position: absolute; top: 152px; right: 30px;
     background: none; border: none; cursor: pointer;
     font-size: 18px; color: var(--mute); line-height: 1;
     font-family: inherit;
@@ -128,30 +215,33 @@
     font-size: 10px; color: var(--mute); padding-top: 2px;
   }
 
-  /* hint */
-  .hint {
-    position: fixed; bottom: 64px; left: 50%; transform: translateX(-50%);
-    font-size: 10px; color: var(--mute); letter-spacing: 0.04em; z-index: 40;
-    pointer-events: none; transition: opacity 0.4s ease;
-  }
-  .hint.hide { opacity: 0; }
-
   ::selection { background: #161616; color: #fff; }
 </style>
 </head>
 <body>
   <span class="frame tl">1</span>
-  <span class="frame tc">Programme présidentiel</span>
-  <span class="frame bl">FR</span>
-  <span class="frame bc">France 2027–2034</span>
+  <header class="masthead">
+    <div class="m-kicker">France 2027–2034</div>
+    <div class="m-title" id="hTitle">Programme présidentiel</div>
+  </header>
+  <button class="lang" id="langBtn" aria-label="Langue">FR</button>
+
+  <div class="sources" id="sources">
+    <div class="s-btn" id="sBtn">Sources</div>
+    <div class="s-pop" id="sPop"></div>
+  </div>
 
   <canvas id="scene"></canvas>
   <div id="tags"></div>
 
   <div class="counter" id="counter">
     <div class="c-label" id="cLabel">Programme total</div>
-    <div class="c-value"><span id="cValue">0</span><span class="c-unit">Md€ / an</span></div>
-    <div class="gauge"><div class="fill" id="gaugeFill"></div><span class="g-max" id="gMax">0</span></div>
+    <div class="g-row"><span class="g-tag" id="gCostTag">Coût</span>
+      <div class="gauge"><div class="fill" id="gaugeFill"></div><span class="g-max" id="gMax"></span></div>
+    </div>
+    <div class="g-row"><span class="g-tag" id="gGainTag">Recettes & économies</span>
+      <div class="gauge gain"><div class="fill" id="gainFill"></div><span class="g-max" id="gGain"></span></div>
+    </div>
     <div class="c-foot">Estimations illustratives</div>
   </div>
 
@@ -161,8 +251,6 @@
     <h1 id="pTitle"></h1>
     <ol class="points" id="pPoints"></ol>
   </aside>
-
-  <div class="hint" id="hint">Faites glisser pour tourner — cliquez un pilier</div>
 
 <script>
 const PILLARS = [
@@ -498,31 +586,435 @@ const PILLARS = [
     "Réseau diplomatique et lycées français consolidés : premier réseau mondial préservé comme actif stratégique."]},
 ];
 
-// illustrative additional public spend, Md€/an
-const SPEND = [0.5,1,3,4,3, 2,8,6,2,3, 12,4, 8,5,12,6,2, 10,10,8,6,4,5, 10,12,4, 15,4,2,3];
+// English translations, parallel to PILLARS by index
+const EN = [
+  { short:"Democracy", title:"Democratic and institutional renewal", points:[
+    "Single non-renewable presidential term of 6 or 7 years, freeing the president from re-election calculus.",
+    "A dose of proportional representation (25–30%) in legislative elections for a representative Assembly and a coalition culture.",
+    "A framed citizens' initiative referendum (realistic thresholds, prior constitutional review, budget matters excluded).",
+    "Institutionalized randomly-drawn citizens' conventions, with Parliament required to give a reasoned response to every proposal.",
+    "Drastic limitation of article 49.3 (once per session outside budget bills).",
+    "A renewed status for elected officials: training, career transition, strict limit on repeat terms (3 identical mandates).",
+    "Full transparency: lobbying, ministers' diaries and \"turnkey\" amendments published as open data.",
+    "Voting at 16 paired with a strengthened civic education pathway, and recognition of blank votes.",
+    "Strengthened independence of prosecutors (appointments aligned with sitting judges).",
+    "An annual constitutional debate in Parliament: public assessment of the state of liberties and institutions."]},
+  { short:"Lean state", title:"An effective and simple state", points:[
+    "Permanent general review of public policies: every expenditure over €1bn evaluated every 5 years, scrapped or reformed if ineffective.",
+    "\"One norm created = two removed\" rule, with a public ledger of norms kept by the Conseil d'État.",
+    "One-third reduction in the number of state agencies and operators through mergers or reinternalization.",
+    "Generalized right to error and binding advance rulings for individuals and SMEs across all administrations.",
+    "Single digital gateway \"France Simple\": no data already held by the administration can be requested again.",
+    "Binding deadlines: any administrative authorization not processed within the legal deadline counts as accepted (except security/health).",
+    "Senior civil service: mandatory mobility in companies and the field, pay partially tied to results.",
+    "Three-year multi-annual state budget to end year-by-year improvisation.",
+    "A quarterly \"France dashboard\": 30 outcome indicators (health, school, security, climate) publicly tracked.",
+    "Sovereign AI in the administration to automate repetitive tasks and redeploy staff to human-facing service."]},
+  { short:"Justice", title:"Justice", points:[
+    "Double the justice budget over 10 years to reach the European average per capita.",
+    "Recruit 3,000 additional judges and 5,000 clerks; goal: divorce or civil dispute judged in under 6 months.",
+    "Prison plan: 20,000 additional places AND massive development of alternative sentences for short terms.",
+    "Real enforcement of sentences: every sentence carried out within 3 months.",
+    "Local justice restored: local courts or circuit hearings in every living area.",
+    "Full digitization of procedures with a single judicial file shared between police, prosecution and court.",
+    "Strengthened economic and financial justice (national financial prosecutor's office doubled).",
+    "Revalued legal aid to guarantee real access to the law.",
+    "Effective care for victims: single point of contact, psychological support, automatic case updates.",
+    "Juvenile justice reform: fast educational response (within 1 month), systematic from the first offense."]},
+  { short:"Security", title:"Domestic security", points:[
+    "Redeploying police to the street: +30% field presence through debureaucratization (online complaints, AI).",
+    "Strengthened judicial police: the clearance rate, not arrest counts, becomes the central indicator.",
+    "National anti-narcotics plan: asset-targeting of network leaders, systematic seizures, stronger European cooperation.",
+    "Security continuum: clear contracts between state, municipal police and private security with mission-sharing.",
+    "Fight against domestic violence: mass deployment of protective bracelets, emergency housing places doubled.",
+    "Cybersecurity: reinforced ANSSI, mandatory security standards for all local authorities and hospitals.",
+    "Community policing reinstated in 300 neighborhoods with stable staffing (retention via bonuses and housing).",
+    "IGPN reformed into a genuinely independent oversight authority to restore police-public trust.",
+    "Territorial intelligence strengthened against foreign interference, violent separatism and radicalization.",
+    "Youth crime prevention: massive investment in early detection, parental support and sport."]},
+  { short:"Territories", title:"Decentralization and territories", points:[
+    "A clear decentralization act: one competence, one responsible authority, aligned funding.",
+    "Fiscal autonomy restored for local authorities (local tax share) in exchange for stronger budget accountability.",
+    "Right to differentiation: territories may adapt national norms through evaluated experimentation.",
+    "\"France of sub-prefectures\" plan: strengthened France Services houses, state presence within 20 minutes.",
+    "Opening up: completion of everyday rail lines and 100% 5G/fiber coverage by 2030.",
+    "Rural areas: increased funding for municipalities that host public services and new housing.",
+    "Incentivized mergers of micro-municipalities and clarification of administrative layers (one redundant tier removed over time).",
+    "State-region plan contracts refocused on 3 priorities per region, genuinely funded.",
+    "Strengthened Banque des Territoires to fund the revitalization of mid-size town centers.",
+    "Local elected official status: decent compensation, legal protection, to stem the crisis of municipal vocations."]},
+  { short:"Finances", title:"Sustainable public finances", points:[
+    "2027–2034 programming law: deficit back under 3% in 5 years, debt stabilized then declining (≈116% of GDP today).",
+    "Two-thirds of the effort on spending (systematic reviews), one-third on targeted revenue, no general tax increase.",
+    "Hunt on ineffective tax and social loopholes: €30bn of niches with no proven effect on jobs or investment scrapped.",
+    "Volume cap on operating expenditure of the state and its operators for 5 years.",
+    "Massive fight against tax and social fraud: data mining, control staff doubled, target +€15bn/yr recovered.",
+    "Golden management rule: any new spending scheme funded by an equivalent documented saving.",
+    "Temporary, targeted de-indexation of benefits for wealthy households, full protection for the most modest.",
+    "Independent budget committee (strengthened HCFP) with public alert powers binding the parliamentary calendar.",
+    "Sale of non-strategic assets: state holdings and property without public service missions.",
+    "Every euro saved on debt interest (€67bn/yr today) redirected to schools and research: make the effort visible and motivating."]},
+  { short:"Work", title:"Work and full employment", points:[
+    "Goal: 72% employment rate (German level) by 2034, activating seniors, youth and struggling areas.",
+    "Lower labor costs on middle wages (1.3–2.5× minimum wage), where wage compression plays out.",
+    "\"Low-wage trap\" reform: smoothing benefit phase-outs so every hour worked always pays more.",
+    "Senior employment: binding index, simplified work-pension combination, progressive retirement as a right.",
+    "France Travail bound to results by employment area, with intensive support for the long-term unemployed.",
+    "Evaluated scaling of \"Zero long-term unemployment territories\" where it works.",
+    "Mandatory negotiation on work quality (autonomy, hardship, meaning): France is Europe's quiet-quitting champion.",
+    "Value sharing: profit-sharing extended to all companies with over 11 employees.",
+    "Radical simplification of pay slips and labor law for very small businesses (dedicated micro-business labor code.)",
+    "Major occupational health plan: preventing professional wear, funded mid-career retraining for arduous jobs."]},
+  { short:"Industry", title:"Reindustrialization and innovation", points:[
+    "Goal: industry from 10% to 13.5% of GDP by 2034, priority to strategic sectors (energy, health, defense, agrifood, electronics).",
+    "Competitive industrial electricity prices guaranteed by long-term contracts backed by nuclear power.",
+    "Industrial simplification shock: single siting authorization within 9 months max, pre-equipped \"turnkey\" sites.",
+    "Productive investment tax credit targeted at robotization and decarbonization of industrial SMEs.",
+    "Patriotic public procurement: European-content criteria in public contracts, within current EU law then renegotiated.",
+    "Doubling training flows of engineers, technicians and welder-boilermakers (critically scarce trades).",
+    "French sovereign fund backed by savings (life insurance, savings accounts) channeled to industrial mid-caps and deeptech.",
+    "Research-industry continuity: Fraunhofer-type institutes in 10 sectors, co-funded public-private.",
+    "Anti-predation protection: reinforced screening of foreign investment in strategic assets.",
+    "Reconquering critical supply chains: essential medicines, mature semiconductors, batteries — quantified domestic production targets."]},
+  { short:"SMEs", title:"SMEs, entrepreneurship and economic simplification", points:[
+    "Mandatory SME test: no economic law without an impact study on small and mid-size businesses.",
+    "Raising and smoothing social thresholds (11/50 threshold effects spread over 5 years).",
+    "A real single window to create, hire, export: one contact, one file.",
+    "Payment terms: automatic sanctions and name-and-shame for large groups that pay late.",
+    "Easier business transfers (secured Dutreil pact, support): 700,000 businesses to hand over in 10 years.",
+    "Access to financing: public guarantees refocused on early growth and SME exports.",
+    "Consolidated independent-worker status: portable social protection, adapted unemployment insurance.",
+    "Town-center shops and artisans: lighter local taxation against vacant premises, fight against unfair platform competition.",
+    "Mandatory mediation before any administration-business litigation.",
+    "\"Zero paper\" goal: 100% of business procedures online with pre-filled forms."]},
+  { short:"Taxation", title:"Fair and efficient taxation", points:[
+    "Tax stability guaranteed by a programming law: no tax-base rule changed for 5 years.",
+    "Progressive shift from labor to externalities: cut charges, tax pollution, rents and unproductive land more.",
+    "Minimum effective tax on very large economically idle fortunes (inspired by Zucman's work, calibrated to avoid exile).",
+    "Fight against multinational tax optimization: firm application of the OECD pillar and country-by-country transparency.",
+    "Targeted cut of remaining production taxes (C3S abolished) funded by spending reviews.",
+    "Reformed inheritance tax: lifetime per-beneficiary allowances, higher taxation of very large non-reinvested transfers.",
+    "Reduced VAT on repair, reuse and durable products.",
+    "Progressive removal of micro-taxes with low yield and high collection cost.",
+    "Optional individualization of income tax so second earners are no longer penalized.",
+    "Consent to taxation: a personalized annual statement — \"where your taxes go\" — readable and verifiable."]},
+  { short:"Housing", title:"Housing", points:[
+    "Goal: 400,000 homes per year including 120,000 social, prioritizing high-demand areas.",
+    "Land shock: release of public land, deterrent taxation of buildable-land hoarding.",
+    "Simplified appeals: urban-planning litigation deadlines halved, abusive appeals sanctioned.",
+    "Builder mayors rewarded: funding tied to permits issued and homes delivered.",
+    "Mass energy renovation: single window, near-zero out-of-pocket for modest households, a trained craft sector.",
+    "Renewed private landlord status: depreciation for homes rented at affordable rents, protection against unpaid rent.",
+    "Youth and student housing: 60,000 new student places, universal rental guarantee for under-30s.",
+    "Converting empty offices into housing: fast-track procedure and tax incentive.",
+    "Evaluated regulation of tourist rentals in high-demand areas.",
+    "Reinforced \"Housing First\" plan to eradicate family and child homelessness by 2032."]},
+  { short:"Agriculture", title:"Agriculture and food", points:[
+    "Farmer income: strict, controlled application of Egalim, floor prices negotiated by sector in times of crisis.",
+    "Generational renewal: 20,000 supported farm installations per year (land carry, young farmer grant doubled).",
+    "Protein and fruit-vegetable sovereignty: a reconquest plan for deficit productions.",
+    "Contracted agroecological transition: multi-year payments for environmental services (water, carbon, biodiversity).",
+    "Simplification: one coordinated annual inspection, an agricultural right to error.",
+    "Crop research and agritech: massive investment to adapt crops to the 2050 climate.",
+    "Water: storage + sobriety plan co-built territory by territory, priority to efficient irrigation.",
+    "European mirror clauses: no imported product that fails our production standards.",
+    "Healthy food for all: 100% sustainable collective catering, food vouchers for modest households aimed at fresh French produce.",
+    "Animal welfare: planned, supported exit from the most contested practices, mandatory labeling."]},
+  { short:"Primary school", title:"Primary school and foundational knowledge", points:[
+    "Absolute priority to primary school: align per-pupil investment with the OECD average (France under-invests in primary, over-invests in high school).",
+    "National goal: 100% of pupils reading fluently and at ease with arithmetic by age 8, publicly measured.",
+    "Evidence-based methods (structured phonics, Singapore-style explicit math) generalized with matching teacher training.",
+    "Halved class sizes extended to all early-primary classes in priority and rural education.",
+    "Net teacher pay rise (+15% over the term) in exchange for more on-site presence and guaranteed substitute coverage.",
+    "Rebuilt initial teacher training: recruitment at bachelor level, two years of paid, heavily practical apprenticeship.",
+    "School-director autonomy with real status, against regular evaluation of school results.",
+    "Systematic support: any reading difficulty detected treated within 6 weeks (tutoring, speech therapy, rebuilt support networks).",
+    "Digital pause: no individual screen before age 9, massive return of textbooks and handwriting.",
+    "Morning-to-evening school in priority areas: supervised study, sport and music built in to offset unequal destinies."]},
+  { short:"Secondary school", title:"Middle school, high school and the vocational track", points:[
+    "Middle school refocused on consolidating fundamentals: flexible needs-based groups in French and math.",
+    "Anti-bullying: a trained, dedicated team in every school; removal procedure for the bully (not the victim).",
+    "Real revaluation of the vocational track: excellence trade campuses, paid internships, bridges to higher education.",
+    "Apprenticeship consolidated and refocused on sub-baccalaureate levels where its effectiveness is proven.",
+    "Rebuilt guidance: mandatory discovery of trades from age 12, workplace immersion, end of orientation-by-failure.",
+    "School diversity: regulated assignments including private schools under contract, bonus for mixed schools.",
+    "Baccalaureate tightened around demanding national exams; fight against grade inflation.",
+    "Civic education and critical thinking facing social networks and AI: national program co-built with researchers and journalists.",
+    "Daily sport in middle school and guaranteed weekly artistic practice.",
+    "Excellence boarding schools and success networks scaled tenfold for talents from modest backgrounds."]},
+  { short:"Research", title:"Higher education and research", points:[
+    "Reinvestment: research spending raised from 2.2% to 3% of GDP by 2034 (sanctuarized programming law).",
+    "Researcher salaries progressively aligned with the OECD average to stop the brain drain — and attract talent.",
+    "Radical simplification: researchers lose a third of their time to admin; single funding window, revalued base grants.",
+    "University funding through multi-year performance contracts with real management autonomy.",
+    "High-demand fields (health, engineering, AI, teaching): places doubled; dead-end tracks clarified by publishing job-placement rates.",
+    "Bachelor's success: mandatory tutoring, catch-up years, modular credit accumulation.",
+    "Student life: €1 meals kept for grant-holders, mental health support (psychologists on every campus).",
+    "Transfer: every public research euro tied to valorization goals, easier deeptech startup spin-offs.",
+    "Attracting the world's best researchers: competitive welcome packages, express scientific visa.",
+    "Academic freedom constitutionally protected; evaluation by peers, not by controversy."]},
+  { short:"AI & digital", title:"Artificial intelligence and digital", points:[
+    "National AI strategy: 1% of GDP cumulative over 7 years (public + private mobilized) to avoid falling behind the US and China.",
+    "Sovereign champions supported (models, cloud, chips) through public procurement and the sovereign fund.",
+    "Electricity + data centers: dedicated nuclear-backed supply to make France the home of European compute.",
+    "AI in public services: health, education, justice — with independent evaluation and mandatory human oversight.",
+    "Training: 100,000 AI specialists by 2032, an AI module in every higher-education program.",
+    "Worker shield: anticipating transformed jobs, a right to retraining funded from productivity gains.",
+    "Protecting minors online: effective age verification, ban on addictive design, platform liability engaged.",
+    "Data sovereignty: health and government data hosted exclusively under European law.",
+    "Firm enforcement of European rules (DSA/DMA/AI Act) with real sanctions, while simplifying for startups.",
+    "Permanent democratic debate on AI: citizens' convention, transparency of public uses, social scoring banned."]},
+  { short:"Culture", title:"Culture, media and the French language", points:[
+    "Culture pass redirected toward guided discovery (live performance, heritage, reading) rather than consumption.",
+    "Reading plan: libraries open Sundays and evenings, school book funding doubled.",
+    "The cultural exception in the AI era: creators paid for model training, corpus transparency.",
+    "Public broadcasting reformed and sanctuarized: independence guaranteed by dedicated multi-year funding.",
+    "Media pluralism: tighter concentration limits, protection of source confidentiality.",
+    "Support for local and investigative journalism (press subscription tax credit).",
+    "Heritage: a ten-year plan for endangered religious and industrial buildings, integration work-site schools.",
+    "Artistic education: guaranteed musical or theatrical practice throughout primary and middle school.",
+    "Economic and cultural francophonie: double the resources of Alliances Françaises and cultural industries abroad.",
+    "Consolidated artist-author status (social protection, collective bargaining with platforms)."]},
+  { short:"Health", title:"Health", points:[
+    "Ending medical deserts: a 4th year of general-practice training served in under-served areas, temporarily regulated specialist installation.",
+    "Mass delegation of procedures: pharmacists, advanced practice nurses and medical assistants to free up medical time.",
+    "Hospital: exit from 100% activity-based pricing, mixed quality/population funding, governance returned to caregivers.",
+    "Enforceable caregiver-to-patient ratios and a re-attractiveness plan (night pay, housing, hospital crèches).",
+    "Preventive turn: 5% of the health budget devoted to prevention (tobacco, alcohol, obesity, inactivity) with quantified goals.",
+    "Mental health as the great cause of the term: broader psychologist reimbursement, rebuilt child psychiatry, suicide prevention.",
+    "Digital health: genuinely shared medical records, generalized tele-expertise, clinically validated triage AI.",
+    "Health sovereignty: reshoring of critical medicines, strategic stocks, guaranteed prices for essential mature products.",
+    "Protected out-of-pocket costs: consolidated dental-optical-hearing shield, fight against abusive overbilling.",
+    "Health democracy: citizen conferences on health priorities, transparency of quality data by facility."]},
+  { short:"Aging", title:"Aging and autonomy", points:[
+    "The long-awaited elderly-care law finally passed and funded: estimated need +€10bn/yr by 2030 (massive boomer aging).",
+    "Home first: revalued home-care hours, out-of-pocket costs capped by income.",
+    "Recruitment and dignity: 100,000 positions in elder care, revalued pay and careers.",
+    "Nursing homes: enforceable minimum staffing ratio, reinforced surprise inspections after the scandals, cost transparency.",
+    "Intermediate housing: autonomy residences, inclusive housing, family care — triple the supply.",
+    "Caregivers: longer compensated leave, an effective right to respite, pension credit.",
+    "Preventing loss of autonomy: systematic frailty screening at 70, reimbursed adapted physical activity.",
+    "Fighting isolation: senior civic service, active municipal registers, regular visits.",
+    "End of life: palliative care guaranteed in every department (the law enforced), dignified support for everyone's choices.",
+    "Silver economy: a French home-automation and gerontech sector supported."]},
+  { short:"Family", title:"Childhood, families and demography", points:[
+    "A real public early-childhood service: 200,000 childcare places created, progressive pricing, controlled quality.",
+    "Reformed parental leave: shorter, much better paid (75% of salary), shared between both parents.",
+    "Family allowance from the first child, refocused on middle and modest-income classes.",
+    "Fight against infertility: a national plan (research, prevention, assisted-reproduction access without delays).",
+    "An enforceable childcare guarantee before the child's 3rd birthday by 2032.",
+    "Rebuilt child protection: staffing standards in child services, end of unsupported exits at 18, strengthened child psychiatry.",
+    "Parenting support: systematic check-ins and guidance across the first 1,000 days.",
+    "Child support payments: universal financial intermediation against unpaid support.",
+    "Work-family balance: an effective right to parental part-time in both directions, regulated remote work.",
+    "Family housing: priority consideration of families in affordable-housing allocation."]},
+  { short:"Solidarity", title:"Solidarity and the fight against poverty", points:[
+    "Automatic payment of social benefits (solidarity at source): 30% of those entitled never claim income support.",
+    "A single social allowance merging the minima, readable, with systematic work-incentive top-ups.",
+    "Eradicating child poverty: a family resource guarantee, €1 school canteen, free breakfast in priority schools.",
+    "Renewed income-support accompaniment: 15–20h of real insertion activity with a real advisor (not punitive control without means).",
+    "Emergency housing sized to needs + scale-up of Housing First.",
+    "Food insecurity: a large-scale trial of food social security.",
+    "Over-indebtedness: stronger banking prevention, an effective cap on incident fees.",
+    "Banking and digital inclusion: guaranteed human support for all essential procedures.",
+    "Social and solidarity economy: wider reserved public procurement, multi-year funding for associations.",
+    "An official public measure of poverty in living conditions, with a quantified reduction target audited annually."]},
+  { short:"Pensions", title:"Pensions", points:[
+    "A 12-month social conference for a global agreement — then a validation referendum: the reform must be legitimate to last.",
+    "Course: system balance by 2035 without cutting pensions already drawn.",
+    "Real recognition of hardship: early departures based on healthy life expectancy by occupation.",
+    "Framed freedom: a more contributory system letting people leave earlier with less or later with more, knowingly.",
+    "Senior employment as the system's condition: without jobs after 60, any age increase is a disguised pension cut.",
+    "A guaranteed contributory minimum at 85% of the minimum wage for a full career, indexed.",
+    "Gender equality: correcting pension gaps (40% today) through renewed family rights.",
+    "Complementary collective funding: a framed ramp-up (ERAFP-type) invested in the French economy.",
+    "Total transparency: a simple annual statement showing everyone their projected pension under three scenarios.",
+    "Strengthened joint governance with automatic steering subject to periodic political validation."]},
+  { short:"Cohesion", title:"Cohesion, equal opportunity and community life", points:[
+    "A unified plan for poor suburbs and rural areas: education, jobs, security and health concentrated on 300 priority territories with results obligations.",
+    "Massive anti-discrimination testing (hiring, housing) with deterrent, public sanctions.",
+    "An equal-opportunity index in large companies and the civil service (social origin included).",
+    "Universal national service replaced by a long, genuinely funded, degree-bearing voluntary civic service.",
+    "Sport for all: a concrete Olympic legacy, 5,000 local facilities, expanded sport on prescription.",
+    "Community life: multi-year funding as the norm, a simplification shock for grants.",
+    "Gender equality: full pay transparency (EU directive applied and beyond), violence prevention funded to actual need.",
+    "Disability: real accessibility (transport, schools, jobs) with a binding timeline; permanent status for school aides.",
+    "Secularism: firm, equal application, training for all public agents, support for field actors.",
+    "Memory and a shared narrative: strengthened teaching of all components of French history, including colonial, without repentance or denial."]},
+  { short:"Energy", title:"Decarbonized energy", points:[
+    "An assumed nuclear relaunch: 6 EPR2 committed + 8 optional, an accelerated SMR sector, safe extension of the existing fleet.",
+    "Complementary renewables: solar on rooftops and brownfields first, offshore wind planned coast by coast.",
+    "Power grids: €100bn of planned grid investment for the electrification of uses.",
+    "Structural sobriety: the sobriety plan (-10% achieved in 2022–23) made permanent and fair.",
+    "Electricity prices: long-term contracts reflecting the nuclear fleet's cost for households and industry.",
+    "Fossil exit: a supported end to oil boilers, decarbonized gas (biomethane) raised to 20% by 2034.",
+    "Hydrogen focused on heavy industry, not scattered.",
+    "Training: 100,000 skilled jobs to fill in nuclear and grids — an energy-trades schools plan.",
+    "Fuel sovereignty: secured uranium supply and enrichment, strengthened recycling.",
+    "Energy Europe: interconnections and defense of nuclear as green energy in all European rules."]},
+  { short:"Transport", title:"Transport, buildings and the circular economy", points:[
+    "A €100bn / 15-year rail plan: network regeneration, metropolitan express rail in 13 major cities, freight doubled.",
+    "A people's electric car: social leasing made permanent, charging points guaranteed everywhere, support for the European industry.",
+    "Thermal renovation: 700,000 deep renovations per year, public third-party financing to remove upfront costs.",
+    "Everyday mobility: incentivized carpooling, safe cycle paths, rural access (on-demand transport).",
+    "Air and sea: sustainable fuels (rising mandates), modal shift to rail on relevant domestic routes.",
+    "Urban planning: net-zero land take kept but simplified and financially supported for mayors.",
+    "Circular economy: an extended durability index, spare parts guaranteed 10 years, reduced VAT on repair.",
+    "Waste: generalized glass and plastic deposit-return, fight against illegal exports.",
+    "Public procurement: bio-sourced and low-carbon materials favored (French wood, low-carbon concrete).",
+    "The European carbon border tax defended, proceeds fully redistributed to modest households."]},
+  { short:"Biodiversity", title:"Biodiversity, water and adaptation", points:[
+    "A funded national +4°C adaptation plan: France must prepare for the worst scenario while fighting to avoid it.",
+    "Water: a sobriety plan (-10% withdrawals by 2030), wastewater reuse scaled tenfold, network leaks repaired.",
+    "Effective strong protection of 10% of the territory; biodiversity-agency and protected-area resources doubled.",
+    "Forests: a renewal plan adapted to the future climate, reinforced fire defense, a structured wood sector.",
+    "Pesticides: a contracted reduction path with alternative solutions funded BEFORE bans.",
+    "Restoring hedgerows, wetlands and ecological corridors: quantified targets in every region.",
+    "Coastline: a national recomposition strategy facing shoreline retreat, a support fund for municipalities.",
+    "Natural risks: a culture of risk (drills, alerts), insurability guaranteed by disaster-regime reform.",
+    "Health-environment: a national plan against forever chemicals (PFAS), urban air quality.",
+    "Nature diplomacy: ocean leadership (after UNOC Nice 2025) and global biodiversity funding."]},
+  { short:"Defense", title:"Defense and strategic sovereignty", points:[
+    "The defense effort raised toward 3–3.5% of GDP by 2034, in line with NATO commitments and the lasting Russian threat.",
+    "A consolidated war economy: munitions, drones and ground-air defense mass-produced in France and Europe.",
+    "Nuclear deterrence modernized and sanctuarized, the European dimension of the umbrella open to debate with our partners.",
+    "The operational reserve raised to 100,000; the army-nation bond strengthened (expanded voluntary military preparation).",
+    "Hybrid warfare: cyber command and information warfare funded to the threat level, election protection.",
+    "Space and the seabed: surveillance and action capabilities in the new domains of conflict.",
+    "Defense innovation: a dedicated agency able to buy fast from startups (an 18-month cycle, not 15 years).",
+    "Support for Ukraine locked in for the long term: our security is being decided in Kyiv.",
+    "A European defense industry: European preference in procurement, consolidated joint programs (SCAF, MGCS or realistic alternatives).",
+    "Soldier retention: housing, families, the wounded — the military condition raised to a priority."]},
+  { short:"Europe", title:"Europe as a power", points:[
+    "Offensive implementation of the Draghi report: a deepened single market (capital, energy, telecoms), a competitiveness shock.",
+    "A savings and investment union: mobilize the €300bn of European savings leaving for the US every year.",
+    "European preference in strategic public procurement and firm trade reciprocity (China, US).",
+    "Enlargement (Ukraine, the Balkans) conditioned on governance reform: extended qualified-majority voting.",
+    "Trade policy: agreements with enforceable health and environmental mirror clauses.",
+    "Common borders: reinforced Frontex, balanced migration partnerships, genuinely European asylum (the pact enforced).",
+    "Technological sovereignty: an Airbus of AI, cloud and quantum — massive joint funding.",
+    "The European budget raised through own resources (carbon border tax, taxation of digital giants).",
+    "European defense: a credible autonomous action capability, complementary to NATO, driven by an enlarged Franco-German couple (Poland, Italy).",
+    "Making Europe visible to citizens: every European funding displayed, transnational citizens' conventions."]},
+  { short:"Immigration", title:"Immigration and integration", points:[
+    "A clear doctrine: real control of flows + demanding, successful integration of those already here — both, seriously.",
+    "Work immigration steered by needs: shortage-occupation lists revised annually with the social partners.",
+    "Asylum: a final decision in 6 months (case-handling resources doubled), effective protection of refugees, effective removal of rejected applicants.",
+    "Renewed migration agreements with origin countries: visas, development aid and readmissions negotiated together.",
+    "A relentless fight against smugglers and illegal work (heavier employer sanctions).",
+    "Integration through language: 600 hours of mandatory, funded French, conditioning multi-year permits.",
+    "Integration through work: fast work authorization for asylum seekers with high protection prospects.",
+    "Unaccompanied minors: real protection, reliable age assessment, immediate schooling.",
+    "Demanding, valued naturalization: a ceremony, a language level, verified adherence to republican principles.",
+    "Democratic transparency: an annual parliamentary debate on quantified targets, complete public data."]},
+  { short:"Overseas", title:"Overseas territories, francophonie and influence", points:[
+    "A real overseas convergence plan: the cost of living fought (margin transparency, competition), water and health infrastructure upgraded.",
+    "Exemplary reconstruction of Mayotte and priority climate adaptation of overseas territories.",
+    "Energy and food autonomy for the overseas territories: a 2035 goal, a lever for local jobs.",
+    "New Caledonia and Polynesia: respectful institutional dialogue, shared economic development.",
+    "The exclusive economic zone (the world's 2nd largest) valorized: ocean research, a sustainable blue economy, sovereign surveillance.",
+    "Refocused development aid: health, education and climate in Africa, with systematic impact evaluation.",
+    "A rebuilt relationship with Africa: equal-to-equal economic partnerships, talent mobility, an end to posturing.",
+    "An offensive francophonie: a 700M-speaker goal supported (teachers, digital content, cultural industries).",
+    "Scientific and climate diplomacy: France as mediator of the commons (oceans, forests, AI).",
+    "The diplomatic network and French lycées consolidated: the world's top network preserved as a strategic asset."]},
+];
+
+const UI = {
+  fr: { title: "Programme présidentiel", total: "Programme total", unit: "Md€ / an", foot: "Chiffrage 2034 — annexe", axe: "Axe", pilier: "Pilier",
+        cost: "Coût brut", gain: "Recettes & économies" },
+  en: { title: "Presidential programme", total: "Total programme", unit: "€bn / yr", foot: "2034 costing — annex", axe: "Axis", pilier: "Pillar",
+        cost: "Gross cost", gain: "Revenue & savings" }
+};
+// Sources: institutions and documents cited in the programme + costing annex.
+// This site renders those documents — it did not independently audit them.
+const SOURCES = {
+  fr: {
+    btn: "Sources",
+    groups: [
+      { h: "Institutions et diagnostics convergents", items: [
+        "Cour des comptes", "France Stratégie", "Conseil d'analyse économique",
+        "Haut Conseil pour le Climat", "OCDE", "Institut Montaigne", "Terra Nova",
+        "IFRAP", "OFCE", "Haut Conseil des finances publiques (HCFP)" ] },
+      { h: "Rapports et travaux cités", items: [
+        "Rapport Draghi sur la compétitivité européenne (2024)",
+        "Travaux de Gabriel Zucman sur la taxation des hauts patrimoines",
+        "Pilier 2 de l'accord fiscal OCDE / G20",
+        "UNOC — Conférence des Nations unies sur l'océan, Nice 2025",
+        "Modèle des instituts Fraunhofer (Allemagne)" ] },
+      { h: "Chiffrage", items: [
+        "Annexe de chiffrage pilier par pilier (Md€/an, régime de croisière 2034)",
+        "Fiabilité auto-évaluée : ★★★ consensus, ★★ ordre de grandeur, ★ pari sur effets retour" ] },
+      { h: "Design", items: [
+        "Marianne — caractère typographique de l'État (DSFR)" ] }
+    ],
+    note: "Ces sources sont celles citées dans les documents du programme. Ce site les restitue ; il ne les a pas auditées indépendamment. Les montants sont des estimations, pas des prévisions."
+  },
+  en: {
+    btn: "Sources",
+    groups: [
+      { h: "Institutions and converging diagnoses", items: [
+        "Cour des comptes (national audit office)", "France Stratégie",
+        "Conseil d'analyse économique", "High Council on Climate", "OECD",
+        "Institut Montaigne", "Terra Nova", "IFRAP", "OFCE",
+        "High Council of Public Finance (HCFP)" ] },
+      { h: "Reports and work cited", items: [
+        "Draghi report on European competitiveness (2024)",
+        "Gabriel Zucman's work on taxing large fortunes",
+        "Pillar 2 of the OECD / G20 tax agreement",
+        "UNOC — UN Ocean Conference, Nice 2025",
+        "The Fraunhofer institute model (Germany)" ] },
+      { h: "Costing", items: [
+        "Pillar-by-pillar costing annex (€bn/yr, 2034 cruising speed)",
+        "Self-assessed reliability: ★★★ consensus, ★★ order of magnitude, ★ bet on feedback effects" ] },
+      { h: "Design", items: [
+        "Marianne — the French state typeface (DSFR)" ] }
+    ],
+    note: "These are the sources cited in the programme documents. This site renders them; it has not independently audited them. Figures are estimates, not forecasts."
+  }
+};
+
+let lang = "fr";
+try { lang = localStorage.getItem("lang") || "fr"; } catch (e) {}
+function L(i) { return lang === "en" ? EN[i] : PILLARS[i]; }
+
+// Md€/an at cruising speed (2034), from the pillar-by-pillar costing annex.
+// COST = gross cost, GAIN = revenue & savings.
+const COST = [0.3,1,9,4,2,   0,8,6,2,5,   5,3,   6,4,8,4,1.5,   8,10,6,5,4,3,   2,15,4,   32,1,2,3];
+const GAIN = [0,25,0.5,1.5,2, 85,45,10,3,13, 4,0.5, 0,1,0,5,0,   4,0,2,1,10,0,   0,1,0,    3,0,1.5,0];
+const SPEND = COST;
 const TOTAL = SPEND.reduce((a,b)=>a+b, 0);
 
 // ================= spend counter =================
 const cLabel = document.getElementById("cLabel");
-const cValue = document.getElementById("cValue");
 const gaugeFill = document.getElementById("gaugeFill");
+const gainFill = document.getElementById("gainFill");
+const gMax = document.getElementById("gMax");
+const gGain = document.getElementById("gGain");
 const counterEl = document.getElementById("counter");
-document.getElementById("gMax").textContent = Math.round(TOTAL);
+const TOTAL_GAIN = GAIN.reduce((a, b) => a + b, 0);
 
-let curVal = 0, tweenId = 0;
-function setCounter(scope, val, isPillar) {
+let curVal = 0, curGain = 0, tweenId = 0;
+function fmtVal(v) {
+  const s = v.toFixed(1);
+  return (lang === "fr" ? s.replace(".", ",") : s) + " " + UI[lang].unit;
+}
+function setCounter(scope, val, isPillar, gain) {
+  gain = gain || 0;
   cLabel.textContent = scope;
   counterEl.classList.toggle("pillar", !!isPillar);
-  gaugeFill.style.width = Math.max(3, (val / TOTAL) * 100) + "%";
-  const from = curVal, to = val, t0 = performance.now(), dur = 620;
+  gaugeFill.style.width = Math.max(2, (val / TOTAL) * 100) + "%";
+  gainFill.style.width = Math.max(2, (gain / TOTAL_GAIN) * 100) + "%";
+  const c0 = curVal, c1 = val, g0 = curGain, g1 = gain;
+  const t0 = performance.now(), dur = 620;
   cancelAnimationFrame(tweenId);
   (function step(now) {
     const k = Math.min(1, (now - t0) / dur);
     const e = 1 - Math.pow(1 - k, 3);
-    const v = from + (to - from) * e;
-    cValue.textContent = v.toFixed(1).replace(".", ",");
+    gMax.textContent = fmtVal(c0 + (c1 - c0) * e);
+    gGain.textContent = fmtVal(g0 + (g1 - g0) * e);
     if (k < 1) tweenId = requestAnimationFrame(step);
-    else curVal = to;
+    else { curVal = c1; curGain = g1; }
   })(t0);
 }
 
@@ -539,7 +1031,7 @@ function resize() {
   canvas.width = W * DPR; canvas.height = H * DPR;
   canvas.style.width = W + "px"; canvas.style.height = H + "px";
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  CX = W / 2; CY = H / 2;
+  CX = W / 2; CY = H * 0.58; // sphere sits lower — header breathes
   R = Math.min(W, H) * 0.34;
 }
 window.addEventListener("resize", resize);
@@ -613,16 +1105,20 @@ const edges = [];
   Object.values(byAxe).forEach(m => {
     for (let j = 1; j < m.length; j++) add(m[j], m[j === m.length - 1 ? 1 : j + 1]);
   });
+
 }
 
 // --- pillar tags (HTML) ---
 const tags = [];
 let read = new Set();
 try { read = new Set(JSON.parse(localStorage.getItem("readPillars") || "[]")); } catch (e) {}
+function tagHTML(i) {
+  return '<span class="n">' + String(i + 1).padStart(2, "0") + '</span>' + L(i).short + '<span class="tick">✓</span>';
+}
 PILLARS.forEach((p, i) => {
   const el = document.createElement("div");
   el.className = "tag" + (read.has(i) ? " read" : "");
-  el.innerHTML = '<span class="n">' + String(i + 1).padStart(2, "0") + '</span>' + p.short + '<span class="tick">✓</span>';
+  el.innerHTML = tagHTML(i);
   el.addEventListener("click", (e) => { e.stopPropagation(); select(i); });
   tagLayer.appendChild(el);
   tags.push(el);
@@ -634,20 +1130,46 @@ function markRead(i) {
   try { localStorage.setItem("readPillars", JSON.stringify([...read])); } catch (e) {}
 }
 
-// --- rotation state ---
-let yaw = 0.6, pitch = -0.18;
+// --- rotation state: quaternion trackball (no pole, no gimbal lock, endless drag) ---
+function qmul(a, b) {
+  return [
+    a[0]*b[0] - a[1]*b[1] - a[2]*b[2] - a[3]*b[3],
+    a[0]*b[1] + a[1]*b[0] + a[2]*b[3] - a[3]*b[2],
+    a[0]*b[2] - a[1]*b[3] + a[2]*b[0] + a[3]*b[1],
+    a[0]*b[3] + a[1]*b[2] - a[2]*b[1] + a[3]*b[0]
+  ];
+}
+function qaxis(ax, ay, az, ang) {
+  const h = ang / 2, s = Math.sin(h);
+  return [Math.cos(h), ax * s, ay * s, az * s];
+}
+function qnorm(q) { const l = Math.hypot(q[0], q[1], q[2], q[3]) || 1; return q.map(v => v / l); }
+function qapply(q, p) {
+  const [w, x, y, z] = q;
+  const tx = 2 * (y * p.z - z * p.y);
+  const ty = 2 * (z * p.x - x * p.z);
+  const tz = 2 * (x * p.y - y * p.x);
+  return {
+    x: p.x + w * tx + (y * tz - z * ty),
+    y: p.y + w * ty + (z * tx - x * tz),
+    z: p.z + w * tz + (x * ty - y * tx)
+  };
+}
+function qslerp(a, b, t) {
+  let d = a[0]*b[0] + a[1]*b[1] + a[2]*b[2] + a[3]*b[3];
+  if (d < 0) { b = b.map(v => -v); d = -d; }
+  if (d > 0.9995) return qnorm(a.map((v, i) => v + (b[i] - v) * t));
+  const th = Math.acos(d), s = Math.sin(th);
+  return a.map((v, i) => (v * Math.sin((1 - t) * th) + b[i] * Math.sin(t * th)) / s);
+}
+
+let q = qmul(qaxis(1, 0, 0, -0.18), qaxis(0, 1, 0, 0.6));
 const AUTO = 0.0016;
 let dragging = false, lastX = 0, lastY = 0, moved = 0;
 let sel = null;
-let anim = null; // {y0,p0,y1,p1,t0,dur}
+let anim = null; // {q0, q1, t0, dur}
 
-function rot(p) {
-  const cyw = Math.cos(yaw), syw = Math.sin(yaw);
-  const x = p.x * cyw + p.z * syw;
-  const z = -p.x * syw + p.z * cyw;
-  const cp = Math.cos(pitch), sp = Math.sin(pitch);
-  return { x, y: p.y * cp - z * sp, z: p.y * sp + z * cp };
-}
+function rot(p) { return qapply(q, p); }
 let cxOff = 0; // sphere shifts left while the panel is open
 function project(v, rad) {
   const s = F / (F - v.z * rad);
@@ -666,8 +1188,9 @@ canvas.addEventListener("pointermove", e => {
   moved += Math.abs(dx) + Math.abs(dy);
   lastX = e.clientX; lastY = e.clientY;
   anim = null;
-  yaw += dx * 0.005;
-  pitch = Math.max(-1.2, Math.min(1.2, pitch + dy * 0.005));
+  // rotate about screen axes — unbounded in every direction
+  const d = qmul(qaxis(0, 1, 0, dx * 0.005), qaxis(1, 0, 0, dy * 0.005));
+  q = qnorm(qmul(d, q));
 });
 canvas.addEventListener("pointerup", e => {
   dragging = false; canvas.classList.remove("dragging");
@@ -677,32 +1200,74 @@ canvas.addEventListener("pointerup", e => {
 // --- select / close ---
 function select(i) {
   sel = i;
-  const p = nodes[i];
-  // target: rotate node to front-center → yaw = atan2(-x, z), pitch = atan2(y, hypot(x,z))
-  let ty = Math.atan2(-p.x, p.z);
-  const tp = Math.atan2(p.y, Math.hypot(p.x, p.z));
-  // shortest path for yaw
-  const d = ((ty - yaw) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
-  ty = yaw + d;
-  anim = { y0: yaw, p0: pitch, y1: ty, p1: tp, t0: performance.now(), dur: 850 };
+  // target: shortest rotation bringing this node to the front (0,0,1)
+  const c = qapply(q, nodes[i]);
+  const dot = Math.max(-1, Math.min(1, c.z));           // dot(c, front)
+  let r;
+  if (dot > 0.99999) r = [1, 0, 0, 0];                  // already facing us
+  else if (dot < -0.99999) r = qaxis(0, 1, 0, Math.PI); // antipodal — any perpendicular axis
+  else {
+    const ax = c.y, ay = -c.x, az = 0;                  // cross(c, front)
+    const l = Math.hypot(ax, ay, az);
+    r = qaxis(ax / l, ay / l, az / l, Math.acos(dot));
+  }
+  anim = { q0: q, q1: qnorm(qmul(r, q)), t0: performance.now(), dur: 850 };
 
-  const pl = PILLARS[i];
-  document.getElementById("pEyebrow").textContent = "Axe " + pl.axis + " · Pilier " + (i + 1);
-  document.getElementById("pTitle").textContent = pl.title;
-  document.getElementById("pPoints").innerHTML = pl.points.map(pt => "<li>" + pt + "</li>").join("");
-  document.getElementById("panel").classList.add("open");
-  document.getElementById("hint").classList.add("hide");
-  setCounter(pl.title, SPEND[i], true);
+  fillPanel(i);
+  const pnl = document.getElementById("panel");
+  pnl.classList.add("open");
+  pnl.scrollTop = 0;
+  counterEl.classList.remove("hidden");
+  setCounter(L(i).title, COST[i], true, GAIN[i]);
   markRead(i);
   tags.forEach((t, k) => t.classList.toggle("sel", k === i));
+}
+function fillPanel(i) {
+  const pl = L(i);
+  document.getElementById("pEyebrow").textContent = UI[lang].axe + " " + PILLARS[i].axis + " · " + UI[lang].pilier + " " + (i + 1);
+  document.getElementById("pTitle").textContent = pl.title;
+  document.getElementById("pPoints").innerHTML = pl.points.map(pt => "<li>" + pt + "</li>").join("");
 }
 function closePanel() {
   sel = null; anim = null;
   document.getElementById("panel").classList.remove("open");
-  setCounter("Programme total", TOTAL, false);
+  document.getElementById("panel").scrollTop = 0;
+  counterEl.classList.remove("hidden");
+  setCounter(UI[lang].total, TOTAL, false, TOTAL_GAIN);
   tags.forEach(t => t.classList.remove("sel"));
 }
-document.getElementById("panelClose").addEventListener("click", close);
+
+// --- language switch ---
+const langBtn = document.getElementById("langBtn");
+function applyLang(l) {
+  lang = l;
+  try { localStorage.setItem("lang", l); } catch (e) {}
+  document.documentElement.lang = l;
+  document.getElementById("hTitle").textContent = UI[l].title;
+  langBtn.textContent = l.toUpperCase();
+  gMax.textContent = fmtVal(curVal);
+  gGain.textContent = fmtVal(curGain);
+  document.getElementById("gCostTag").textContent = UI[l].cost;
+  document.getElementById("gGainTag").textContent = UI[l].gain;
+  document.querySelector(".c-foot").textContent = UI[l].foot;
+  const S = SOURCES[l];
+  document.getElementById("sBtn").textContent = S.btn;
+  document.getElementById("sPop").innerHTML =
+    S.groups.map(g => "<h4>" + g.h + "</h4><ul>" +
+      g.items.map(it => "<li>" + it + "</li>").join("") + "</ul>").join("") +
+    '<p class="note">' + S.note + "</p>";
+  tags.forEach((el, i) => { el.innerHTML = tagHTML(i); });
+  if (sel !== null) { fillPanel(sel); cLabel.textContent = L(sel).title; }
+  else cLabel.textContent = UI[l].total;
+}
+langBtn.addEventListener("click", () => applyLang(lang === "fr" ? "en" : "fr"));
+document.getElementById("panelClose").addEventListener("click", closePanel);
+
+// hide the counter once the panel scrolls under it
+const panelEl = document.getElementById("panel");
+panelEl.addEventListener("scroll", () => {
+  counterEl.classList.toggle("hidden", panelEl.scrollTop > 24);
+});
 document.addEventListener("keydown", e => { if (e.key === "Escape") closePanel(); });
 
 // --- render loop ---
@@ -715,11 +1280,10 @@ function frame(now) {
   if (anim) {
     const k = Math.min(1, (now - anim.t0) / anim.dur);
     const e = 1 - Math.pow(1 - k, 3);
-    yaw = anim.y0 + (anim.y1 - anim.y0) * e;
-    pitch = anim.p0 + (anim.p1 - anim.p0) * e;
-    if (k >= 1) anim = null;
+    q = qslerp(anim.q0, anim.q1, e);
+    if (k >= 1) { q = anim.q1; anim = null; }
   } else if (!dragging && sel === null) {
-    yaw += AUTO;
+    q = qnorm(qmul(qaxis(0, 1, 0, AUTO), q));
   }
 
   ctx.clearRect(0, 0, W, H);
@@ -761,7 +1325,8 @@ function frame(now) {
   requestAnimationFrame(frame);
 }
 
-setCounter("Programme total", TOTAL, false);
+applyLang(lang);
+setCounter(UI[lang].total, TOTAL, false, TOTAL_GAIN);
 requestAnimationFrame(frame);
 </script>
 </body>
