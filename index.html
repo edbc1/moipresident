@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>France 2027–2034 — Programme</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  :root {
+    --ink: #161616;
+    --paper: #f7f6f2;
+    --mute: #9a9a9a;
+    --line: #e6e4de;
+  }
+  html, body { height: 100%; overflow: hidden; }
+  body {
+    background: var(--paper);
+    background-image: radial-gradient(ellipse at 50% 42%, #ffffff 0%, var(--paper) 62%, #edece7 100%);
+    color: var(--ink);
+    font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    line-height: 1.5;
+    letter-spacing: -0.01em;
+  }
+
+  /* corner frame */
+  .frame { position: fixed; font-size: 10px; color: var(--mute); letter-spacing: 0.05em; z-index: 40; pointer-events: none; }
+  .frame.tl { top: 30px; left: 36px; }
+  .frame.tc { top: 30px; left: 50%; transform: translateX(-50%); }
+  .frame.bl { bottom: 30px; left: 36px; }
+  .frame.bc { bottom: 30px; left: 50%; transform: translateX(-50%); }
+
+  /* canvas + label layer */
+  #scene { position: fixed; inset: 0; cursor: grab; }
+  #scene.dragging { cursor: grabbing; }
+  #tags { position: fixed; inset: 0; pointer-events: none; }
+  .tag {
+    position: absolute; left: 0; top: 0;
+    background: #161616; color: #f7f6f2;
+    font-size: 10px; letter-spacing: 0.02em;
+    padding: 3px 8px 4px; white-space: nowrap;
+    pointer-events: auto; cursor: pointer;
+    will-change: transform, opacity;
+    transition: background 0.15s ease;
+    user-select: none;
+  }
+  .tag:hover { background: #000; }
+  .tag.sel { outline: 1px solid #161616; outline-offset: 2px; }
+  .tag .n { color: #8f8f8f; margin-right: 6px; }
+  .tag .tick { display: none; margin-left: 6px; color: #b9b5ab; font-size: 9px; }
+  .tag.read .tick { display: inline; }
+
+  /* spend counter */
+  .counter {
+    position: fixed; top: 26px; right: 36px; width: 232px; z-index: 60;
+  }
+  .counter .c-label {
+    font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--mute); margin-bottom: 7px; min-height: 12px;
+    overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .counter.pillar .c-label { color: var(--ink); }
+  .counter .c-value {
+    font-size: 24px; font-weight: 600; letter-spacing: -0.02em;
+    font-variant-numeric: tabular-nums; line-height: 1;
+  }
+  .counter .c-value .c-unit { font-size: 11px; color: var(--mute); font-weight: 400; margin-left: 5px; }
+  .counter .gauge {
+    margin-top: 12px; height: 34px; border-radius: 9px;
+    background: rgba(0,0,0,0.045); border: 1px solid var(--line);
+    position: relative; overflow: hidden;
+    display: flex; align-items: center; justify-content: flex-end;
+  }
+  .counter .gauge .fill {
+    position: absolute; top: 0; left: 0; height: 100%;
+    background: #ddd9d0; border-radius: 9px; min-width: 8px;
+    transition: width 0.6s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .counter .gauge .fill::after {
+    content: ""; position: absolute; right: 0; top: 50%;
+    transform: translateY(-50%); width: 2px; height: 60%;
+    background: #b3afa6; border-radius: 2px;
+  }
+  .counter .gauge .g-max {
+    position: relative; z-index: 1; padding-right: 12px;
+    font-size: 12px; color: #8f8f8f; font-variant-numeric: tabular-nums;
+  }
+  .counter .c-foot { margin-top: 6px; font-size: 9px; color: var(--mute); }
+
+  /* context panel */
+  .panel {
+    position: fixed; top: 0; right: 0; bottom: 0; width: 400px; max-width: 92vw;
+    background: rgba(247, 246, 242, 0.96);
+    backdrop-filter: blur(6px);
+    border-left: 1px solid var(--line);
+    z-index: 50; overflow-y: auto;
+    padding: 128px 34px 44px;
+    transform: translateX(102%);
+    transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  .panel.open { transform: translateX(0); }
+  .panel .close {
+    position: absolute; top: 92px; right: 30px;
+    background: none; border: none; cursor: pointer;
+    font-size: 18px; color: var(--mute); line-height: 1;
+    font-family: inherit;
+  }
+  .panel .close:hover { color: var(--ink); }
+  .panel .eyebrow {
+    font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
+    color: var(--mute); margin-bottom: 10px;
+  }
+  .panel h1 {
+    font-size: 21px; font-weight: 600; letter-spacing: -0.02em;
+    line-height: 1.15; margin-bottom: 26px; padding-right: 20px;
+  }
+  .points { list-style: none; counter-reset: pt; }
+  .points li {
+    counter-increment: pt;
+    display: grid; grid-template-columns: 24px 1fr;
+    gap: 12px; padding: 12px 0;
+    border-top: 1px solid var(--line);
+    font-size: 12.5px; line-height: 1.55;
+  }
+  .points li:last-child { border-bottom: 1px solid var(--line); }
+  .points li::before {
+    content: counter(pt, decimal-leading-zero);
+    font-size: 10px; color: var(--mute); padding-top: 2px;
+  }
+
+  /* hint */
+  .hint {
+    position: fixed; bottom: 64px; left: 50%; transform: translateX(-50%);
+    font-size: 10px; color: var(--mute); letter-spacing: 0.04em; z-index: 40;
+    pointer-events: none; transition: opacity 0.4s ease;
+  }
+  .hint.hide { opacity: 0; }
+
+  ::selection { background: #161616; color: #fff; }
+</style>
+</head>
+<body>
+  <span class="frame tl">1</span>
+  <span class="frame tc">Programme présidentiel</span>
+  <span class="frame bl">FR</span>
+  <span class="frame bc">France 2027–2034</span>
+
+  <canvas id="scene"></canvas>
+  <div id="tags"></div>
+
+  <div class="counter" id="counter">
+    <div class="c-label" id="cLabel">Programme total</div>
+    <div class="c-value"><span id="cValue">0</span><span class="c-unit">Md€ / an</span></div>
+    <div class="gauge"><div class="fill" id="gaugeFill"></div><span class="g-max" id="gMax">0</span></div>
+    <div class="c-foot">Estimations illustratives</div>
+  </div>
+
+  <aside class="panel" id="panel">
+    <button class="close" id="panelClose" aria-label="Fermer">✕</button>
+    <div class="eyebrow" id="pEyebrow"></div>
+    <h1 id="pTitle"></h1>
+    <ol class="points" id="pPoints"></ol>
+  </aside>
+
+  <div class="hint" id="hint">Faites glisser pour tourner — cliquez un pilier</div>
+
+<script>
+const PILLARS = [
+  { axis:"I", short:"Démocratie", title:"Rénovation démocratique et institutionnelle", points:[
+    "Mandat présidentiel unique de 6 ou 7 ans, non renouvelable, pour libérer le président du calcul de réélection.",
+    "Introduction d'une dose de proportionnelle (25–30 %) aux législatives pour une Assemblée représentative et une culture de coalition.",
+    "Référendum d'initiative citoyenne encadré (seuils réalistes, contrôle constitutionnel préalable, sujets budgétaires exclus).",
+    "Conventions citoyennes tirées au sort institutionnalisées, avec obligation de réponse motivée du Parlement à chaque proposition.",
+    "Limitation drastique du recours au 49.3 (une fois par session hors textes budgétaires).",
+    "Statut de l'élu rénové : formation, reconversion, limitation stricte du cumul dans le temps (3 mandats identiques).",
+    "Transparence intégrale : lobbying, agendas des ministres et amendements « clés en main » publiés en open data.",
+    "Vote à 16 ans assorti d'un parcours d'éducation civique renforcé, et reconnaissance du vote blanc.",
+    "Indépendance renforcée du parquet (nomination alignée sur les magistrats du siège).",
+    "Grand débat constitutionnel annuel au Parlement : évaluation publique de l'état des libertés et des institutions."]},
+  { axis:"I", short:"État simple", title:"Un État efficace et simple", points:[
+    "Revue générale des politiques publiques permanente : chaque dépense >1 Md€ évaluée tous les 5 ans, supprimée ou réformée si inefficace.",
+    "Règle « une norme créée = deux supprimées », avec comptabilité publique des normes tenue par le Conseil d'État.",
+    "Réduction d'un tiers du nombre d'agences et d'opérateurs de l'État par fusion ou réinternalisation.",
+    "Droit à l'erreur généralisé et rescrit opposable pour les particuliers et PME dans toutes les administrations.",
+    "Guichet unique numérique « France Simple » : aucune donnée déjà détenue par l'administration ne peut être redemandée.",
+    "Délais opposables : toute autorisation administrative non traitée dans le délai légal vaut acceptation (hors sécurité/santé).",
+    "Haute fonction publique : mobilité obligatoire en entreprise/terrain, rémunération partiellement liée aux résultats.",
+    "Budget pluriannuel de l'État voté sur 3 ans pour sortir de la navigation à vue annuelle.",
+    "Publication d'un « tableau de bord de la France » trimestriel : 30 indicateurs de résultat (santé, école, sécurité, climat) suivis publiquement.",
+    "IA souveraine dans l'administration pour automatiser les tâches répétitives et rediriger les agents vers l'accueil humain."]},
+  { axis:"I", short:"Justice", title:"Justice", points:[
+    "Doubler le budget de la justice sur 10 ans pour rejoindre la moyenne européenne par habitant.",
+    "Recrutement de 3 000 magistrats et 5 000 greffiers supplémentaires ; objectif : divorce ou litige civil jugé en moins de 6 mois.",
+    "Plan carcéral : 20 000 places supplémentaires ET développement massif des peines alternatives pour les courtes peines.",
+    "Exécution réelle des peines : toute peine prononcée exécutée dans les 3 mois.",
+    "Justice de proximité restaurée : tribunaux d'instance ou audiences foraines dans chaque bassin de vie.",
+    "Numérisation complète des procédures avec dossier judiciaire unique partagé police-parquet-siège.",
+    "Renforcement de la justice économique et financière (parquet national financier doublé).",
+    "Aide juridictionnelle revalorisée pour garantir l'accès réel au droit.",
+    "Prise en charge effective des victimes : guichet unique, suivi psychologique, information automatique sur la procédure.",
+    "Réforme de la justice des mineurs : réponse éducative rapide (sous 1 mois) et systématique dès le premier acte."]},
+  { axis:"I", short:"Sécurité", title:"Sécurité intérieure", points:[
+    "Redéploiement de la police sur la voie publique : objectif +30 % de présence terrain via la débureaucratisation (plainte en ligne, IA).",
+    "Police judiciaire renforcée : le taux d'élucidation, pas le chiffre d'interpellations, devient l'indicateur central.",
+    "Plan national anti-narcotrafic : ciblage patrimonial des têtes de réseau, saisies d'avoirs systématiques, coopération européenne renforcée.",
+    "Continuum de sécurité : contrats clairs État–polices municipales–sécurité privée avec répartition des missions.",
+    "Lutte contre les violences intrafamiliales : bracelets anti-rapprochement massifiés, places d'hébergement d'urgence doublées.",
+    "Cybersécurité : ANSSI renforcée, obligation de standards de sécurité pour toutes les collectivités et hôpitaux.",
+    "Police de proximité réinstaurée dans 300 quartiers avec des effectifs stables (fidélisation par prime et logement).",
+    "Réforme de l'IGPN vers une autorité de contrôle réellement indépendante pour restaurer la confiance police-population.",
+    "Renseignement territorial renforcé contre les ingérences étrangères, le séparatisme violent et la radicalisation.",
+    "Prévention de la délinquance juvénile : investissement massif dans le repérage précoce, le soutien parental et le sport."]},
+  { axis:"I", short:"Territoires", title:"Décentralisation et territoires", points:[
+    "Acte de décentralisation clair : à chaque compétence une seule collectivité responsable, financements alignés.",
+    "Autonomie fiscale restaurée pour les collectivités (part d'impôt locale) contre responsabilité budgétaire renforcée.",
+    "Droit à la différenciation : les territoires peuvent adapter les normes nationales par expérimentation évaluée.",
+    "Plan « France des sous-préfectures » : maisons France Services renforcées, présence de l'État garanti à moins de 20 min.",
+    "Désenclavement : achèvement des lignes ferroviaires du quotidien et couverture 5G/fibre à 100 % en 2030.",
+    "Zones rurales : dotation revalorisée pour les communes qui accueillent services publics et logements neufs.",
+    "Fusion incitée des micro-communes et clarification du mille-feuille (suppression d'un échelon redondant à terme).",
+    "Contrats de plan État-régions recentrés sur 3 priorités par région, réellement financés.",
+    "Banque des territoires renforcée pour financer la revitalisation des centres-villes moyens.",
+    "Statut de l'élu local : indemnisation décente, protection juridique, pour enrayer la crise des vocations municipales."]},
+  { axis:"II", short:"Finances", title:"Finances publiques soutenables", points:[
+    "Loi de programmation 2027–2034 : retour du déficit sous 3 % en 5 ans, stabilisation puis décrue de la dette (≈116 % du PIB aujourd'hui).",
+    "Effort porté aux deux tiers sur la dépense (revues de dépenses systématiques), un tiers sur des recettes ciblées, sans hausse générale d'impôts.",
+    "Chasse aux niches fiscales et sociales inefficaces : suppression de 30 Md€ de niches sans effet démontré sur l'emploi ou l'investissement.",
+    "Plafonnement en volume des dépenses de fonctionnement de l'État et des opérateurs pendant 5 ans.",
+    "Lutte massive contre la fraude fiscale et sociale : data mining, effectifs de contrôle doublés, objectif +15 Md€/an recouvrés.",
+    "Règle d'or de gestion : tout nouveau dispositif de dépense financé par une économie documentée équivalente.",
+    "Désindexation temporaire et ciblée des dépenses sur les ménages aisés, protection intégrale des plus modestes.",
+    "Comité budgétaire indépendant (HCFP renforcé) avec pouvoir d'alerte publique contraignant le calendrier parlementaire.",
+    "Cession du non-stratégique : participations et immobilier de l'État sans mission de service public.",
+    "Chaque euro d'économie sur les intérêts de la dette (67 Md€/an aujourd'hui) fléché vers école et recherche : rendre l'effort visible et motivant."]},
+  { axis:"II", short:"Travail", title:"Travail et plein emploi", points:[
+    "Objectif : taux d'emploi de 72 % (niveau allemand) en 2034, en activant seniors, jeunes et bassins sinistrés.",
+    "Allègement du coût du travail sur les salaires moyens (1,3–2,5 SMIC) où se joue la désmicardisation.",
+    "Réforme de la « trappe à bas salaires » : lissage des sorties d'aides sociales pour que chaque heure travaillée paie toujours plus.",
+    "Emploi des seniors : index contraignant, cumul emploi-retraite simplifié, retraite progressive de droit.",
+    "France Travail doté d'obligations de résultat par bassin d'emploi, avec accompagnement intensif des chômeurs longue durée.",
+    "Généralisation évaluée de « Territoires zéro chômeur de longue durée » là où cela fonctionne.",
+    "Négociation obligatoire sur la qualité du travail (autonomie, pénibilité, sens) : la France est championne d'Europe de la démission silencieuse.",
+    "Partage de la valeur : participation étendue à toutes les entreprises >11 salariés.",
+    "Simplification radicale du bulletin de paie et du droit du travail pour les TPE (code du travail TPE dédié).",
+    "Grand plan santé au travail : prévention de l'usure professionnelle, reconversion à mi-carrière financée pour les métiers pénibles."]},
+  { axis:"II", short:"Industrie", title:"Réindustrialisation et innovation", points:[
+    "Objectif : part de l'industrie de 10 à 13,5 % du PIB en 2034, priorité aux secteurs stratégiques (énergie, santé, défense, agroalimentaire, électronique).",
+    "Prix de l'électricité industriel compétitif garanti par contrats long terme adossés au nucléaire.",
+    "Choc de simplification industrielle : autorisation unique d'implantation en 9 mois maximum, sites « clés en main » pré-aménagés.",
+    "Crédit d'impôt investissement productif ciblé sur robotisation et décarbonation des PME industrielles.",
+    "Commande publique patriote : critères de contenu européen dans les marchés publics, à droit européen constant puis renégocié.",
+    "Doublement des flux de formation d'ingénieurs, techniciens et soudeurs-chaudronniers (métiers en tension critique).",
+    "Fonds souverain français adossé à l'épargne (assurance-vie, livrets) fléché vers les ETI industrielles et deeptechs.",
+    "Continuité recherche-industrie : instituts de type Fraunhofer dans 10 filières, cofinancés public-privé.",
+    "Protection anti-prédation : contrôle renforcé des investissements étrangers dans les actifs stratégiques.",
+    "Reconquête des chaînes critiques : médicaments essentiels, semi-conducteurs matures, batteries — objectifs de production domestique chiffrés."]},
+  { axis:"II", short:"PME", title:"PME, entrepreneuriat et simplification économique", points:[
+    "Test PME obligatoire : aucune loi économique sans étude d'impact sur les TPE-PME.",
+    "Relèvement et lissage des seuils sociaux (effets de seuil 11/50 étalés sur 5 ans).",
+    "Guichet unique réel pour créer, embaucher, exporter : un interlocuteur, un dossier.",
+    "Délais de paiement : sanctions automatiques et name & shame pour les grands groupes mauvais payeurs.",
+    "Transmission d'entreprise facilitée (pacte Dutreil sécurisé, accompagnement) : 700 000 entreprises à transmettre en 10 ans.",
+    "Accès au financement : garanties publiques recentrées sur primo-développement et export des PME.",
+    "Statut de l'indépendant consolidé : protection sociale portable, assurance chômage adaptée.",
+    "Commerces et artisans de centre-ville : fiscalité locale allégée contre les friches, lutte contre la concurrence déloyale des plateformes.",
+    "Médiation obligatoire avant tout contentieux administration-entreprise.",
+    "Objectif « zéro papier » : 100 % des démarches entreprises en ligne avec pré-remplissage."]},
+  { axis:"II", short:"Fiscalité", title:"Fiscalité juste et efficace", points:[
+    "Stabilité fiscale garantie par une loi de programmation : aucune règle d'assiette modifiée pendant 5 ans.",
+    "Bascule progressive du travail vers les externalités : baisser les charges, taxer davantage pollution, rentes et foncier improductif.",
+    "Impôt minimal effectif sur les très hauts patrimoines économiquement inactif (inspiré des travaux Zucman, calibré pour éviter l'exil).",
+    "Lutte contre l'optimisation des multinationales : application ferme du pilier OCDE et transparence pays par pays.",
+    "Baisse ciblée des impôts de production restants (C3S supprimée) financée par les revues de dépenses.",
+    "Fiscalité successorale réformée : abattements par bénéficiaire tout au long de la vie, taxation accrue des très grosses transmissions non réinvesties.",
+    "TVA réduite sur la réparation, le réemploi et les produits durables.",
+    "Suppression progressive des micro-taxes à rendement faible et coût de collecte élevé.",
+    "Individualisation possible de l'impôt sur le revenu pour ne plus pénaliser le travail du deuxième conjoint.",
+    "Consentement à l'impôt : relevé annuel personnalisé « où vont vos impôts », lisible et vérifiable."]},
+  { axis:"II", short:"Logement", title:"Logement", points:[
+    "Objectif : 400 000 logements/an dont 120 000 sociaux, en priorité dans les zones tendues.",
+    "Choc foncier : libération des terrains publics, fiscalité dissuasive sur la rétention foncière constructible.",
+    "Simplification des recours : délais contentieux d'urbanisme divisés par deux, recours abusifs sanctionnés.",
+    "Maires bâtisseurs récompensés : dotation liée aux permis délivrés et logements livrés.",
+    "Rénovation énergétique massifiée : guichet unique, reste à charge quasi nul pour les ménages modestes, filière artisanale formée.",
+    "Statut du bailleur privé rénové : amortissement du logement loué à loyer abordable, sécurisation contre les impayés.",
+    "Logement des jeunes et étudiants : 60 000 places étudiantes nouvelles, garantie locative universelle pour les <30 ans.",
+    "Transformation de bureaux vides en logements : procédure accélérée et incitation fiscale.",
+    "Encadrement évalué des meublés touristiques dans les zones tendues.",
+    "Plan « Logement d'abord » renforcé pour éradiquer le sans-abrisme des familles et enfants d'ici 2032."]},
+  { axis:"II", short:"Agriculture", title:"Agriculture et alimentation", points:[
+    "Revenu paysan : application stricte et contrôlée d'Egalim, prix planchers négociés par filière en cas de crise.",
+    "Renouvellement des générations : 20 000 installations/an soutenues (portage foncier, dotation jeune agriculteur doublée).",
+    "Souveraineté protéique et fruits-légumes : plan de reconquête des productions déficitaires.",
+    "Transition agroécologique contractualisée : paiements pour services environnementaux (eau, carbone, biodiversité) pluriannuels.",
+    "Simplification : un contrôle unique annuel coordonné, droit à l'erreur agricole.",
+    "Recherche variétale et agritech : investissement massif pour adapter les cultures au climat 2050.",
+    "Eau : plan stockage + sobriété co-construit territoire par territoire, priorité à l'irrigation efficiente.",
+    "Clauses miroirs européennes : aucun produit importé ne respectant pas nos normes de production.",
+    "Alimentation saine pour tous : restauration collective 100 % durable, chèque alimentaire pour les ménages modestes fléché produits frais français.",
+    "Bien-être animal : sortie programmée et accompagnée des pratiques les plus contestées, étiquetage obligatoire."]},
+  { axis:"III", short:"Primaire", title:"École primaire et savoirs fondamentaux", points:[
+    "Priorité absolue au primaire : aligner l'investissement par élève sur la moyenne OCDE (la France sous-investit en primaire, surinvestit au lycée).",
+    "Objectif national : 100 % des élèves lecteurs fluides et à l'aise en calcul en fin de CE2, mesuré publiquement.",
+    "Méthodes fondées sur les preuves (syllabique structurée, mathématiques explicites type Singapour) généralisées avec formation associée.",
+    "Dédoublement étendu à toutes les classes de GS-CP-CE1 en éducation prioritaire et rurale.",
+    "Revalorisation nette des enseignants (+15 % sur le quinquennat) contre présence accrue dans l'établissement et remplacement garanti.",
+    "Formation initiale des professeurs refondée : recrutement à bac+3, deux ans d'alternance rémunérée massivement pratique.",
+    "Autonomie des directeurs d'école avec statut, contre évaluation régulière des résultats de l'établissement.",
+    "Soutien systématique : toute difficulté repérée en lecture traitée sous 6 semaines (tutorat, orthophonie, RASED reconstitués).",
+    "Pause numérique : pas d'écran individuel avant le CM1, retour massif du manuel et de l'écriture manuscrite.",
+    "École du matin au soir dans les REP : étude dirigée, sport, musique intégrés pour compenser les inégalités de destin."]},
+  { axis:"III", short:"Collège & lycée", title:"Collège, lycée et voie professionnelle", points:[
+    "Collège recentré sur la consolidation des fondamentaux : groupes de besoins flexibles en français et maths.",
+    "Lutte contre le harcèlement : équipe dédiée formée dans chaque établissement, procédure d'éloignement du harceleur (pas de la victime).",
+    "Revalorisation réelle de la voie professionnelle : campus des métiers d'excellence, rémunération des stages, passerelles vers le supérieur.",
+    "Apprentissage consolidé et recentré sur les niveaux infra-bac où son efficacité est démontrée.",
+    "Orientation refondée : découverte obligatoire des métiers dès la 5e, testing en entreprise, fin de l'orientation par l'échec.",
+    "Mixité scolaire : régulation des affectations incluant le privé sous contrat, bonus aux établissements mixtes.",
+    "Bac resserré sur des épreuves nationales exigeantes ; lutte contre l'inflation des notes.",
+    "Éducation civique et esprit critique face aux réseaux et à l'IA : programme national coconstruit avec chercheurs et journalistes.",
+    "Sport quotidien au collège et pratique artistique hebdomadaire garantie.",
+    "Internats d'excellence et cordées de la réussite décuplés pour les talents des milieux modestes."]},
+  { axis:"III", short:"Recherche", title:"Enseignement supérieur et recherche", points:[
+    "Réinvestissement : dépense de recherche portée de 2,2 % à 3 % du PIB en 2034 (loi de programmation sanctuarisée).",
+    "Salaires des chercheurs alignés progressivement sur la moyenne OCDE pour arrêter l'exode des cerveaux — et en attirer.",
+    "Simplification radicale : les chercheurs perdent un tiers de leur temps en administratif ; guichet unique ANR, dotations de base revalorisées.",
+    "Financement des universités par contrats de performance pluriannuels avec vraie autonomie de gestion.",
+    "Filières en tension (santé, ingénierie, IA, enseignement) : places doublées ; filières sans débouchés éclairées par la publication des taux d'insertion.",
+    "Réussite en licence : tutorat obligatoire, années de remise à niveau, capitalisation modulaire.",
+    "Vie étudiante : repas à 1 € pérennisé pour les boursiers, santé mentale (psychologues dans chaque campus).",
+    "Transfert : chaque euro public de recherche assorti d'objectifs de valorisation, essaimage de startups deeptech facilité.",
+    "Attraction des meilleurs chercheurs mondiaux : packages d'accueil compétitifs, visa scientifique express.",
+    "Liberté académique protégée constitutionnellement ; évaluation par les pairs, pas par la polémique."]},
+  { axis:"III", short:"IA & numérique", title:"Intelligence artificielle et numérique", points:[
+    "Stratégie nationale IA : 1 % du PIB cumulé sur 7 ans (public + privé mobilisé) pour ne pas décrocher face aux USA et à la Chine.",
+    "Champions souverains soutenus (modèles, cloud, puces) par la commande publique et le fonds souverain.",
+    "Électricité + data centers : offre dédiée adossée au nucléaire pour faire de la France la terre d'accueil du calcul européen.",
+    "IA dans les services publics : santé, éducation, justice — avec évaluation indépendante et supervision humaine obligatoire.",
+    "Formation : 100 000 spécialistes IA formés d'ici 2032, module IA dans toutes les formations supérieures.",
+    "Bouclier des travailleurs : anticipation des métiers transformés, droit à la reconversion financé par un fonds abondé par les gains de productivité.",
+    "Protection des mineurs en ligne : vérification d'âge effective, interdiction des designs addictifs, responsabilité des plateformes engagée.",
+    "Souveraineté des données : données de santé et régaliennes hébergées sous droit européen exclusivement.",
+    "Application ferme des règlements européens (DSA/DMA/AI Act) avec sanctions réelles, tout en simplifiant pour les startups.",
+    "Débat démocratique permanent sur l'IA : convention citoyenne, transparence des usages publics, interdiction du scoring social."]},
+  { axis:"III", short:"Culture", title:"Culture, médias et langue française", points:[
+    "Pass culture réorienté vers la découverte encadrée (spectacle vivant, patrimoine, lecture) plutôt que la consommation.",
+    "Plan lecture : bibliothèques ouvertes le dimanche et en soirée, dotation livres des écoles doublée.",
+    "Exception culturelle à l'ère de l'IA : rémunération des créateurs pour l'entraînement des modèles, transparence des corpus.",
+    "Audiovisuel public réformé et sanctuarisé : indépendance garantie par financement pluriannuel affecté.",
+    "Pluralisme des médias : limitation renforcée de la concentration, protection du secret des sources.",
+    "Soutien au journalisme local et d'investigation (crédit d'impôt abonnements presse).",
+    "Patrimoine : plan décennal pour le bâti religieux et industriel en péril, chantiers-écoles d'insertion.",
+    "Éducation artistique : pratique musicale ou théâtrale garantie du CP à la 3e.",
+    "Francophonie économique et culturelle : doubler les moyens des Alliances françaises et des industries culturelles à l'export.",
+    "Statut des artistes-auteurs consolidé (protection sociale, négociation collective avec plateformes)."]},
+  { axis:"IV", short:"Santé", title:"Santé", points:[
+    "Sortir du désert médical : 4e année de médecine générale en zone sous-dense, installation régulée temporairement pour les spécialistes.",
+    "Délégation d'actes massifiée : pharmaciens, infirmiers en pratique avancée, assistants médicaux pour libérer du temps médical.",
+    "Hôpital : sortie de la tarification 100 % à l'activité, financement mixte qualité/population, gouvernance redonnée aux soignants.",
+    "Ratios de soignants par patient opposables et plan de réattractivité (salaires de nuit, logement, crèches hospitalières).",
+    "Virage préventif : 5 % du budget santé consacré à la prévention (tabac, alcool, obésité, sédentarité) avec objectifs chiffrés.",
+    "Santé mentale, grande cause du septennat : remboursement élargi des psychologues, pédopsychiatrie reconstruite, prévention du suicide.",
+    "Numérique en santé : dossier médical réellement partagé, télé-expertise généralisée, IA de tri validée cliniquement.",
+    "Souveraineté sanitaire : relocalisation des médicaments critiques, stocks stratégiques, prix garantis pour les produits matures essentiels.",
+    "Restes à charge protégés : bouclier dentaire-optique-audition consolidé, lutte contre les dépassements abusifs.",
+    "Démocratie sanitaire : conférences citoyennes sur les priorités de santé, transparence des données de qualité par établissement."]},
+  { axis:"IV", short:"Grand âge", title:"Grand âge et autonomie", points:[
+    "Loi grand âge enfin votée et financée : besoin estimé à +10 Md€/an d'ici 2030 (vieillissement massif des boomers).",
+    "Priorité domicile : heures d'aide à domicile revalorisées, reste à charge plafonné selon les revenus.",
+    "Recrutement et dignité : 100 000 postes dans le soin aux aînés, salaires et carrières revalorisés.",
+    "EHPAD : ratio d'encadrement minimal opposable, contrôles inopinés renforcés après les scandales, transparence des coûts.",
+    "Habitat intermédiaire : résidences autonomie, habitat inclusif, accueil familial — tripler l'offre.",
+    "Aidants : congé indemnisé allongé, droit au répit effectif, validation retraite.",
+    "Prévention de la perte d'autonomie : repérage systématique de la fragilité à 70 ans, activité physique adaptée remboursée.",
+    "Lutte contre l'isolement : service civique senior, registres communaux actifs, visites régulières.",
+    "Fin de vie : soins palliatifs garantis dans chaque département (application de la loi), accompagnement digne des choix de chacun.",
+    "Silver économie : filière domotique et gérontechnologies française soutenue."]},
+  { axis:"IV", short:"Famille", title:"Enfance, familles et démographie", points:[
+    "Service public de la petite enfance réel : 200 000 places d'accueil créées, tarif progressif, qualité contrôlée.",
+    "Congé parental réformé : plus court, bien mieux rémunéré (75 % du salaire), partagé entre les deux parents.",
+    "Allocation familiale dès le premier enfant, recentrée sur les classes moyennes et modestes.",
+    "Lutte contre l'infertilité : plan national (recherche, prévention, accès PMA sans délais).",
+    "Mode de garde garanti opposable avant les 3 ans de l'enfant d'ici 2032.",
+    "Protection de l'enfance refondée : normes d'encadrement ASE, fin des sorties sèches à 18 ans, pédopsychiatrie renforcée.",
+    "Soutien à la parentalité : entretiens et accompagnement systématiques aux 1 000 premiers jours.",
+    "Pensions alimentaires : intermédiation financière universelle contre les impayés.",
+    "Conciliation vie pro-vie familiale : droit effectif au temps partiel parental dans les deux sens, télétravail encadré.",
+    "Logement familial : prise en compte prioritaire des familles dans l'attribution des logements abordables."]},
+  { axis:"IV", short:"Solidarités", title:"Solidarités et lutte contre la pauvreté", points:[
+    "Versement automatique des prestations sociales (solidarité à la source) : 30 % des ayants droit ne réclament pas le RSA.",
+    "Allocation sociale unique fusionnant les minima, lisible, avec intéressement systématique à la reprise d'emploi.",
+    "Éradication de la pauvreté des enfants : garantie de ressources familiale, cantine à 1 €, petit-déjeuner gratuit dans les REP.",
+    "Accompagnement rénové du RSA : 15–20h d'activité d'insertion réelle avec un vrai référent (pas du contrôle punitif sans moyens).",
+    "Hébergement d'urgence dimensionné aux besoins + montée en charge du Logement d'abord.",
+    "Précarité alimentaire : sécurité sociale de l'alimentation expérimentée à grande échelle.",
+    "Surendettement : prévention bancaire renforcée, plafonnement effectif des frais d'incidents.",
+    "Inclusion bancaire et numérique : accompagnement humain garanti pour toutes les démarches essentielles.",
+    "Économie sociale et solidaire : commande publique réservée élargie, financement pluriannuel des associations.",
+    "Mesure officielle et publique de la pauvreté en conditions de vie, objectif de réduction chiffré et audité annuellement."]},
+  { axis:"IV", short:"Retraites", title:"Retraites", points:[
+    "Conférence sociale de 12 mois pour un accord global — puis référendum de validation : la réforme doit être légitime pour être durable.",
+    "Cap : équilibre du système à horizon 2035 sans baisse des pensions liquidées.",
+    "Prise en compte réelle de la pénibilité : départs anticipés fondés sur l'espérance de vie en bonne santé par métier.",
+    "Liberté encadrée : système plus contributif permettant de partir plus tôt avec moins ou plus tard avec plus, en connaissance de cause.",
+    "Emploi des seniors comme condition du système : sans emploi après 60 ans, tout recul d'âge est une baisse de pension déguisée.",
+    "Minimum contributif garanti à 85 % du SMIC pour une carrière complète, indexé.",
+    "Égalité femmes-hommes : correction des écarts de pension (40 % aujourd'hui) via droits familiaux rénovés.",
+    "Capitalisation collective complémentaire : montée en puissance encadrée (type ERAFP) investie dans l'économie française.",
+    "Transparence totale : relevé annuel simple indiquant à chacun sa pension projetée selon trois scénarios.",
+    "Gouvernance paritaire renforcée avec pilotage automatique soumis à validation politique périodique."]},
+  { axis:"IV", short:"Cohésion", title:"Cohésion, égalité des chances et vie associative", points:[
+    "Plan banlieues et ruralités pauvres unifié : éducation, emploi, sécurité, santé concentrés sur 300 territoires prioritaires avec obligation de résultat.",
+    "Testing anti-discriminations massif (embauche, logement) avec sanctions dissuasives et publiques.",
+    "Index d'égalité des chances dans les grandes entreprises et la fonction publique (origine sociale incluse).",
+    "Service national universel remplacé par un service civique volontaire long, réellement financé et diplômant.",
+    "Sport pour tous : héritage olympique concret, 5 000 équipements de proximité, sport sur ordonnance élargi.",
+    "Vie associative : financement pluriannuel de droit commun, choc de simplification des subventions.",
+    "Égalité femmes-hommes : transparence salariale intégrale (directive européenne appliquée+), lutte contre les violences financée à hauteur du besoin.",
+    "Handicap : accessibilité réelle (transports, écoles, emplois) avec échéancier contraignant ; AESH statutaires.",
+    "Laïcité : application ferme et égale, formation de tous les agents publics, soutien aux acteurs de terrain.",
+    "Mémoire et récit commun : enseignement renforcé de toutes les composantes de l'histoire de France, y compris coloniale, sans repentance ni déni."]},
+  { axis:"V", short:"Énergie", title:"Énergie décarbonée", points:[
+    "Relance nucléaire assumée : 6 EPR2 engagés + 8 en option, filière SMR accélérée, prolongation sûre du parc existant.",
+    "Renouvelables complémentaires : solaire sur toitures et friches en priorité, éolien en mer planifié façade par façade.",
+    "Réseaux électriques : 100 Md€ d'investissement RTE/Enedis planifiés pour l'électrification des usages.",
+    "Sobriété structurelle : poursuite du plan sobriété (-10 % atteints en 2022-23) rendu permanent et équitable.",
+    "Prix de l'électricité : contrats long terme reflétant le coût du parc nucléaire pour ménages et industries.",
+    "Sortie des fossiles : fin des chaudières fioul accompagnée, gaz décarboné (biométhane) porté à 20 % en 2034.",
+    "Hydrogène ciblé sur l'industrie lourde et pas dispersé.",
+    "Formation : 100 000 emplois qualifiés à pourvoir dans le nucléaire et les réseaux — plan écoles des métiers de l'énergie.",
+    "Souveraineté du combustible : sécurisation de l'approvisionnement uranium et enrichissement, recyclage renforcé.",
+    "Europe de l'énergie : interconnexions et défense du nucléaire comme énergie verte dans toutes les règles européennes."]},
+  { axis:"V", short:"Transports", title:"Transports, bâtiment, économie circulaire", points:[
+    "Plan ferroviaire 100 Md€ / 15 ans : régénération du réseau, RER métropolitains dans 13 grandes villes, fret doublé.",
+    "Voiture électrique populaire : leasing social pérennisé, bornes garanties sur tout le territoire, soutien à la filière européenne.",
+    "Rénovation thermique : 700 000 rénovations performantes/an, tiers-financement public pour supprimer l'avance de frais.",
+    "Mobilités du quotidien : covoiturage incité, pistes cyclables sécurisées, désenclavement rural (transport à la demande).",
+    "Aérien et maritime : carburants durables (mandats croissants), report modal train sur les liaisons intérieures pertinentes.",
+    "Urbanisme : zéro artificialisation nette maintenue mais simplifiée et accompagnée financièrement pour les maires.",
+    "Économie circulaire : indice de durabilité étendu, pièces détachées garanties 10 ans, TVA réduite réparation.",
+    "Déchets : consigne du verre et plastique généralisée, lutte contre les exportations illégales.",
+    "Commande publique : matériaux biosourcés et bas carbone privilégiés (bois, béton bas carbone français).",
+    "Fiscalité carbone aux frontières européennes défendue et produit intégralement redistribué aux ménages modestes."]},
+  { axis:"V", short:"Biodiversité", title:"Biodiversité, eau, adaptation", points:[
+    "Plan national d'adaptation à +4 °C financé : la France doit se préparer au pire scénario tout en luttant pour l'éviter.",
+    "Eau : plan sobriété (-10 % de prélèvements en 2030), réutilisation des eaux usées décuplée, fuites des réseaux réparées.",
+    "Protection forte effective de 10 % du territoire ; moyens de l'OFB et des aires protégées doublés.",
+    "Forêts : plan de renouvellement adapté au climat futur, défense incendie renforcée, filière bois structurée.",
+    "Pesticides : trajectoire de réduction contractualisée avec solutions alternatives financées AVANT les interdictions.",
+    "Restauration des haies, zones humides et continuités écologiques : objectifs chiffrés dans chaque région.",
+    "Littoral : stratégie nationale de recomposition face au recul du trait de côte, fonds d'accompagnement des communes.",
+    "Risques naturels : culture du risque (exercices, alertes), assurabilité garantie par une réforme du régime CatNat.",
+    "Santé-environnement : plan national contre les polluants éternels (PFAS), qualité de l'air urbain.",
+    "Diplomatie de la nature : leadership sur l'océan (suite UNOC Nice 2025) et financement de la biodiversité mondiale."]},
+  { axis:"VI", short:"Défense", title:"Défense et souveraineté stratégique", points:[
+    "Effort de défense porté vers 3–3,5 % du PIB d'ici 2034, conformément aux engagements OTAN et à la menace russe durable.",
+    "Économie de guerre consolidée : munitions, drones, défense sol-air produits en masse et en France/Europe.",
+    "Dissuasion nucléaire modernisée et sanctuarisée, dimension européenne du parapluie ouverte au débat avec nos partenaires.",
+    "Réserve opérationnelle portée à 100 000 ; lien armée-nation renforcé (préparation militaire volontaire élargie).",
+    "Guerre hybride : commandement cyber et lutte informationnelle dotés à hauteur de la menace, protection des élections.",
+    "Espace et fonds marins : capacités de surveillance et d'action dans les nouveaux milieux de conflictualité.",
+    "Innovation de défense : agence dédiée capable d'acheter vite aux startups (cycle en 18 mois, pas 15 ans).",
+    "Soutien à l'Ukraine inscrit dans la durée : c'est notre sécurité qui se joue à Kiev.",
+    "Industrie de défense européenne : préférence européenne dans les achats, programmes communs consolidés (SCAF, MGCS ou alternatives réalistes).",
+    "Fidélisation des soldats : logement, familles, blessés — condition militaire hissée en priorité."]},
+  { axis:"VI", short:"Europe", title:"Europe puissance", points:[
+    "Mise en œuvre offensive du rapport Draghi : marché unique approfondi (capital, énergie, télécoms), choc de compétitivité.",
+    "Union de l'épargne et de l'investissement : mobiliser les 300 Md€ d'épargne européenne qui partent chaque année aux USA.",
+    "Préférence européenne dans les marchés publics stratégiques et réciprocité commerciale ferme (Chine, USA).",
+    "Élargissement (Ukraine, Balkans) conditionné à une réforme de la gouvernance : vote à la majorité qualifiée étendu.",
+    "Politique commerciale : accords assortis de clauses miroirs sanitaires et environnementales opposables.",
+    "Frontières communes : Frontex renforcé, partenariats migratoires équilibrés, asile réellement européen (pacte appliqué).",
+    "Souveraineté technologique : Airbus de l'IA, du cloud et du quantique — financements massifs conjoints.",
+    "Budget européen rehaussé par des ressources propres (carbone aux frontières, taxation des géants du numérique).",
+    "Défense européenne : capacité d'action autonome crédible, complémentaire de l'OTAN, portée par le couple franco-allemand élargi (Pologne, Italie).",
+    "Rendre l'Europe visible aux citoyens : chaque financement européen affiché, conventions citoyennes transnationales."]},
+  { axis:"VI", short:"Immigration", title:"Immigration et intégration", points:[
+    "Doctrine claire : maîtrise réelle des flux + intégration exigeante et réussie de ceux qui sont là — les deux, sérieusement.",
+    "Immigration de travail pilotée par les besoins : listes de métiers en tension révisées annuellement avec les partenaires sociaux.",
+    "Asile : décision définitive en 6 mois (moyens OFPRA/CNDA doublés), protection effective des réfugiés, éloignement effectif des déboutés.",
+    "Accords migratoires rénovés avec les pays d'origine : visas, aide au développement et réadmissions négociés ensemble.",
+    "Lutte implacable contre les passeurs et le travail illégal (sanctions employeurs alourdies).",
+    "Intégration par la langue : 600 h de français obligatoires et financées, conditionnant les titres pluriannuels.",
+    "Intégration par le travail : autorisation de travail rapide pour les demandeurs d'asile aux perspectives élevées de protection.",
+    "Mineurs non accompagnés : protection réelle, évaluation d'âge fiabilisée, scolarisation immédiate.",
+    "Naturalisation exigeante et valorisée : cérémonie, niveau de langue, adhésion aux principes républicains vérifiée.",
+    "Transparence démocratique : débat annuel au Parlement sur les objectifs chiffrés, données publiques complètes."]},
+  { axis:"VI", short:"Outre-mer", title:"Outre-mer, francophonie et rayonnement", points:[
+    "Plan de convergence réelle outre-mer : vie chère combattue (transparence des marges, concurrence), infrastructures eau/santé mises à niveau.",
+    "Reconstruction exemplaire de Mayotte et adaptation climatique prioritaire des territoires ultramarins.",
+    "Autonomie énergétique et alimentaire des outre-mer : objectif 2035, levier d'emplois locaux.",
+    "Nouvelle-Calédonie et Polynésie : dialogue institutionnel respectueux, développement économique partagé.",
+    "Zone économique exclusive (2e mondiale) valorisée : recherche océanique, économie bleue durable, surveillance souveraine.",
+    "Aide au développement recentrée : santé, éducation, climat en Afrique, avec évaluation d'impact systématique.",
+    "Relation refondée avec l'Afrique : partenariats économiques d'égal à égal, mobilité des talents, fin des postures.",
+    "Francophonie offensive : objectif 700 M de locuteurs accompagné (enseignants, contenus numériques, industries culturelles).",
+    "Diplomatie scientifique et climatique : la France médiatrice des biens communs (océans, forêts, IA).",
+    "Réseau diplomatique et lycées français consolidés : premier réseau mondial préservé comme actif stratégique."]},
+];
+
+// illustrative additional public spend, Md€/an
+const SPEND = [0.5,1,3,4,3, 2,8,6,2,3, 12,4, 8,5,12,6,2, 10,10,8,6,4,5, 10,12,4, 15,4,2,3];
+const TOTAL = SPEND.reduce((a,b)=>a+b, 0);
+
+// ================= spend counter =================
+const cLabel = document.getElementById("cLabel");
+const cValue = document.getElementById("cValue");
+const gaugeFill = document.getElementById("gaugeFill");
+const counterEl = document.getElementById("counter");
+document.getElementById("gMax").textContent = Math.round(TOTAL);
+
+let curVal = 0, tweenId = 0;
+function setCounter(scope, val, isPillar) {
+  cLabel.textContent = scope;
+  counterEl.classList.toggle("pillar", !!isPillar);
+  gaugeFill.style.width = Math.max(3, (val / TOTAL) * 100) + "%";
+  const from = curVal, to = val, t0 = performance.now(), dur = 620;
+  cancelAnimationFrame(tweenId);
+  (function step(now) {
+    const k = Math.min(1, (now - t0) / dur);
+    const e = 1 - Math.pow(1 - k, 3);
+    const v = from + (to - from) * e;
+    cValue.textContent = v.toFixed(1).replace(".", ",");
+    if (k < 1) tweenId = requestAnimationFrame(step);
+    else curVal = to;
+  })(t0);
+}
+
+// ================= 3D network sphere =================
+const canvas = document.getElementById("scene");
+const ctx = canvas.getContext("2d");
+const tagLayer = document.getElementById("tags");
+let W = 0, H = 0, DPR = 1, CX = 0, CY = 0, R = 0;
+const F = 3.6; // perspective distance (sphere radii)
+
+function resize() {
+  DPR = Math.min(2, window.devicePixelRatio || 1);
+  W = window.innerWidth; H = window.innerHeight;
+  canvas.width = W * DPR; canvas.height = H * DPR;
+  canvas.style.width = W + "px"; canvas.style.height = H + "px";
+  ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
+  CX = W / 2; CY = H / 2;
+  R = Math.min(W, H) * 0.34;
+}
+window.addEventListener("resize", resize);
+resize();
+
+// --- nodes: 30 pillar nodes (fibonacci sphere) + decorative nodes ---
+function fib(i, n) {
+  const g = Math.PI * (3 - Math.sqrt(5));
+  const y = 1 - (i / (n - 1)) * 2;
+  const r = Math.sqrt(1 - y * y);
+  const a = g * i;
+  return { x: Math.cos(a) * r, y, z: Math.sin(a) * r };
+}
+// deterministic pseudo-random
+let seed = 42;
+function rnd() { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }
+
+// pillars grouped by axe: 6 cluster centers, each axe's pillars form a cap around its center
+const nodes = [];
+{
+  const AXE_ORDER = ["I","II","III","IV","V","VI"];
+  const norm = v => { const L = Math.hypot(v.x, v.y, v.z); return { x: v.x/L, y: v.y/L, z: v.z/L }; };
+  const cross = (a, b) => ({ x: a.y*b.z - a.z*b.y, y: a.z*b.x - a.x*b.z, z: a.x*b.y - a.y*b.x });
+  AXE_ORDER.forEach((ax, ci) => {
+    const c = fib(ci, 6);
+    const up = Math.abs(c.y) > 0.9 ? { x: 1, y: 0, z: 0 } : { x: 0, y: 1, z: 0 };
+    const u = norm(cross(up, c));
+    const v = cross(c, u);
+    const members = [];
+    PILLARS.forEach((p, i) => { if (p.axis === ax) members.push(i); });
+    members.forEach((pi, j) => {
+      if (j === 0) { nodes[pi] = { ...c, pillar: pi, rad: 1 }; return; }
+      const a = 0.40; // cap angular radius
+      const phi = (2 * Math.PI * (j - 1)) / (members.length - 1) + ci * 0.7;
+      const ca = Math.cos(a), sa = Math.sin(a), cf = Math.cos(phi), sf = Math.sin(phi);
+      nodes[pi] = {
+        x: ca * c.x + sa * (cf * u.x + sf * v.x),
+        y: ca * c.y + sa * (cf * u.y + sf * v.y),
+        z: ca * c.z + sa * (cf * u.z + sf * v.z),
+        pillar: pi, rad: 1
+      };
+    });
+  });
+}
+// decorative nodes — on the sphere surface, filling the gaps
+for (let i = 0; i < 70; i++) {
+  const p = fib(i, 70);
+  const j = 0.18;
+  let x = p.x + (rnd() - 0.5) * j, y = p.y + (rnd() - 0.5) * j, z = p.z + (rnd() - 0.5) * j;
+  const L = Math.hypot(x, y, z); x /= L; y /= L; z /= L;
+  nodes.push({ x, y, z, pillar: -1, rad: 1 });
+}
+
+// --- edges: k nearest neighbors → connected triangulated mesh ---
+const edges = [];
+{
+  const seen = new Set();
+  const add = (ia, ib) => {
+    const key = ia < ib ? ia + "-" + ib : ib + "-" + ia;
+    if (!seen.has(key)) { seen.add(key); edges.push([ia, ib]); }
+  };
+  nodes.forEach((a, ia) => {
+    const dists = nodes.map((b, ib) => ({ ib, d: (a.x-b.x)**2 + (a.y-b.y)**2 + (a.z-b.z)**2 }))
+      .filter(o => o.ib !== ia).sort((p, q) => p.d - q.d);
+    const k = a.pillar >= 0 ? 2 : 8; // dense mesh between deco nodes, light anchoring for pillars
+    for (let n = 0; n < k; n++) add(ia, dists[n].ib);
+  });
+  // pillars of the same axe: perimeter ring only (no hub spokes — too messy)
+  const byAxe = {};
+  PILLARS.forEach((p, i) => (byAxe[p.axis] = byAxe[p.axis] || []).push(i));
+  Object.values(byAxe).forEach(m => {
+    for (let j = 1; j < m.length; j++) add(m[j], m[j === m.length - 1 ? 1 : j + 1]);
+  });
+}
+
+// --- pillar tags (HTML) ---
+const tags = [];
+let read = new Set();
+try { read = new Set(JSON.parse(localStorage.getItem("readPillars") || "[]")); } catch (e) {}
+PILLARS.forEach((p, i) => {
+  const el = document.createElement("div");
+  el.className = "tag" + (read.has(i) ? " read" : "");
+  el.innerHTML = '<span class="n">' + String(i + 1).padStart(2, "0") + '</span>' + p.short + '<span class="tick">✓</span>';
+  el.addEventListener("click", (e) => { e.stopPropagation(); select(i); });
+  tagLayer.appendChild(el);
+  tags.push(el);
+});
+function markRead(i) {
+  if (read.has(i)) return;
+  read.add(i);
+  tags[i].classList.add("read");
+  try { localStorage.setItem("readPillars", JSON.stringify([...read])); } catch (e) {}
+}
+
+// --- rotation state ---
+let yaw = 0.6, pitch = -0.18;
+const AUTO = 0.0016;
+let dragging = false, lastX = 0, lastY = 0, moved = 0;
+let sel = null;
+let anim = null; // {y0,p0,y1,p1,t0,dur}
+
+function rot(p) {
+  const cyw = Math.cos(yaw), syw = Math.sin(yaw);
+  const x = p.x * cyw + p.z * syw;
+  const z = -p.x * syw + p.z * cyw;
+  const cp = Math.cos(pitch), sp = Math.sin(pitch);
+  return { x, y: p.y * cp - z * sp, z: p.y * sp + z * cp };
+}
+let cxOff = 0; // sphere shifts left while the panel is open
+function project(v, rad) {
+  const s = F / (F - v.z * rad);
+  return { px: CX + cxOff + v.x * rad * R * s, py: CY - v.y * rad * R * s, s, z: v.z };
+}
+
+// --- interaction ---
+canvas.addEventListener("pointerdown", e => {
+  dragging = true; moved = 0; lastX = e.clientX; lastY = e.clientY;
+  canvas.classList.add("dragging");
+  canvas.setPointerCapture(e.pointerId);
+});
+canvas.addEventListener("pointermove", e => {
+  if (!dragging) return;
+  const dx = e.clientX - lastX, dy = e.clientY - lastY;
+  moved += Math.abs(dx) + Math.abs(dy);
+  lastX = e.clientX; lastY = e.clientY;
+  anim = null;
+  yaw += dx * 0.005;
+  pitch = Math.max(-1.2, Math.min(1.2, pitch + dy * 0.005));
+});
+canvas.addEventListener("pointerup", e => {
+  dragging = false; canvas.classList.remove("dragging");
+  if (moved < 6 && sel !== null) closePanel(); // plain click on empty space closes
+});
+
+// --- select / close ---
+function select(i) {
+  sel = i;
+  const p = nodes[i];
+  // target: rotate node to front-center → yaw = atan2(-x, z), pitch = atan2(y, hypot(x,z))
+  let ty = Math.atan2(-p.x, p.z);
+  const tp = Math.atan2(p.y, Math.hypot(p.x, p.z));
+  // shortest path for yaw
+  const d = ((ty - yaw) % (2 * Math.PI) + 3 * Math.PI) % (2 * Math.PI) - Math.PI;
+  ty = yaw + d;
+  anim = { y0: yaw, p0: pitch, y1: ty, p1: tp, t0: performance.now(), dur: 850 };
+
+  const pl = PILLARS[i];
+  document.getElementById("pEyebrow").textContent = "Axe " + pl.axis + " · Pilier " + (i + 1);
+  document.getElementById("pTitle").textContent = pl.title;
+  document.getElementById("pPoints").innerHTML = pl.points.map(pt => "<li>" + pt + "</li>").join("");
+  document.getElementById("panel").classList.add("open");
+  document.getElementById("hint").classList.add("hide");
+  setCounter(pl.title, SPEND[i], true);
+  markRead(i);
+  tags.forEach((t, k) => t.classList.toggle("sel", k === i));
+}
+function closePanel() {
+  sel = null; anim = null;
+  document.getElementById("panel").classList.remove("open");
+  setCounter("Programme total", TOTAL, false);
+  tags.forEach(t => t.classList.remove("sel"));
+}
+document.getElementById("panelClose").addEventListener("click", close);
+document.addEventListener("keydown", e => { if (e.key === "Escape") closePanel(); });
+
+// --- render loop ---
+function frame(now) {
+  // ease sphere center toward its target (left when panel open)
+  const panelW = Math.min(400, W * 0.92);
+  const cxTarget = sel !== null ? -panelW / 2 : 0;
+  cxOff += (cxTarget - cxOff) * 0.08;
+
+  if (anim) {
+    const k = Math.min(1, (now - anim.t0) / anim.dur);
+    const e = 1 - Math.pow(1 - k, 3);
+    yaw = anim.y0 + (anim.y1 - anim.y0) * e;
+    pitch = anim.p0 + (anim.p1 - anim.p0) * e;
+    if (k >= 1) anim = null;
+  } else if (!dragging && sel === null) {
+    yaw += AUTO;
+  }
+
+  ctx.clearRect(0, 0, W, H);
+
+  // rotate + project all nodes
+  const proj = nodes.map(n => project(rot(n), n.rad));
+
+  // edges
+  edges.forEach(([a, b]) => {
+    const A = proj[a], B = proj[b];
+    const zm = (A.z + B.z) / 2;
+    const alpha = zm > 0 ? 0.05 + zm * 0.20 : 0.035 + zm * 0.03;
+    if (alpha <= 0.012) return;
+    ctx.strokeStyle = "rgba(22,22,22," + alpha.toFixed(3) + ")";
+    ctx.lineWidth = zm > 0 ? 0.7 : 0.45;
+    ctx.beginPath(); ctx.moveTo(A.px, A.py); ctx.lineTo(B.px, B.py); ctx.stroke();
+  });
+
+  // node dots
+  proj.forEach((P, i) => {
+    const front = P.z > 0;
+    const r = (nodes[i].pillar >= 0 ? 2.6 : 1.7) * P.s;
+    ctx.fillStyle = "rgba(22,22,22," + (front ? 0.28 + P.z * 0.6 : 0.10).toFixed(3) + ")";
+    ctx.beginPath(); ctx.arc(P.px, P.py, r, 0, 7); ctx.fill();
+  });
+
+  // pillar tags
+  for (let i = 0; i < 30; i++) {
+    const P = proj[i];
+    const el = tags[i];
+    const front = P.z > -0.15;
+    const sc = 0.72 + Math.max(0, P.z) * 0.38;
+    el.style.transform = "translate(-50%, -160%) translate(" + P.px.toFixed(1) + "px," + P.py.toFixed(1) + "px) scale(" + sc.toFixed(3) + ")";
+    el.style.opacity = front ? (0.35 + Math.max(0, P.z) * 0.65).toFixed(2) : "0.07";
+    el.style.pointerEvents = front ? "auto" : "none";
+    el.style.zIndex = String(100 + Math.round(P.z * 100));
+  }
+
+  requestAnimationFrame(frame);
+}
+
+setCounter("Programme total", TOTAL, false);
+requestAnimationFrame(frame);
+</script>
+</body>
+</html>
