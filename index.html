@@ -67,6 +67,15 @@
   .masthead {
     position: fixed; top: 26px; left: 50%; transform: translateX(-50%);
     text-align: center; z-index: 40; pointer-events: none;
+    transition: transform 0.55s cubic-bezier(0.22, 0.61, 0.36, 1);
+  }
+  /* travel with the sphere when the panel pushes it left.
+     Only where the masthead is centred: below 1020px it is left-aligned
+     and the panel covers the viewport anyway. */
+  @media (min-width: 1021px) {
+    body.panel-open .masthead {
+      transform: translateX(calc(-50% - var(--panel-w) / 2));
+    }
   }
   .masthead .m-kicker {
     font-size: 10px; color: var(--mute); letter-spacing: 0.08em;
@@ -1267,6 +1276,7 @@ function select(i) {
   fillPanel(i);
   const pnl = document.getElementById("panel");
   pnl.classList.add("open");
+  document.body.classList.add("panel-open");
   pnl.scrollTop = 0;
   counterEl.classList.remove("hidden");
   setCounter(L(i).title, COST[i], true, GAIN[i]);
@@ -1282,6 +1292,7 @@ function fillPanel(i) {
 function closePanel() {
   sel = null; anim = null;
   document.getElementById("panel").classList.remove("open");
+  document.body.classList.remove("panel-open");
   document.getElementById("panel").scrollTop = 0;
   counterEl.classList.remove("hidden");
   setCounter(UI[lang].total, TOTAL, false, TOTAL_GAIN);
