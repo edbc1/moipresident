@@ -23,7 +23,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&display=swap" rel="stylesheet">
 <style>
-  /* Marianne — official French government typeface (via DSFR) */
+  /* Marianne: official French government typeface (via DSFR) */
   @font-face {
     font-family: "Marianne";
     src: url("https://cdn.jsdelivr.net/npm/@gouvfr/dsfr@1.12.1/dist/fonts/Marianne-Regular.woff2") format("woff2");
@@ -63,7 +63,7 @@
   .frame { position: fixed; font-size: 10px; color: var(--mute); letter-spacing: 0.05em; z-index: 40; pointer-events: none; }
   .frame.tl { top: 30px; left: 36px; }
 
-  /* masthead — kicker above, big title below */
+  /* masthead: kicker above, big title below */
   .masthead {
     position: fixed; top: 26px; left: 50%; transform: translateX(-50%);
     text-align: center; z-index: 40; pointer-events: none;
@@ -177,7 +177,6 @@
     font-size: 12px; font-weight: 500; color: #57544c; font-variant-numeric: tabular-nums;
     white-space: nowrap;
   }
-  .counter .c-foot { margin-top: 6px; font-size: 9px; color: var(--mute); }
 
   /* context panel */
   .panel {
@@ -245,7 +244,7 @@
   .cur.on { display: inline-block; }
   @keyframes blink { 0%, 50% { opacity: 1; } 50.01%, 100% { opacity: 0; } }
 
-  /* tricolore — deliberately flattened: long and low, not a 2:3 flag */
+  /* tricolore: deliberately flattened, long and low, not a 2:3 flag */
   .flag {
     display: flex; width: 132px; height: 5px;
     margin: 2.4em auto 0;
@@ -301,7 +300,6 @@
     <div class="g-row"><span class="g-tag" id="gGainTag">Recettes & économies</span>
       <div class="gauge gain"><div class="fill" id="gainFill"></div><span class="g-max" id="gGain"></span></div>
     </div>
-    <div class="c-foot">Estimations illustratives</div>
   </div>
 
   <aside class="panel" id="panel">
@@ -317,7 +315,7 @@ const PILLARS = [
     "Élire 30 % des députés à la proportionnelle dès 2028 pour que chaque voix compte.",
     "Créer le référendum d'initiative citoyenne : 1 million de signatures, contrôle constitutionnel, vote garanti.",
     "Donner suite à chaque proposition de convention citoyenne : réponse motivée du Parlement sous 6 mois, ou vote.",
-    "Limiter le 49.3 à un usage par session hors budget — inscrit dans la Constitution.",
+    "Limiter le 49.3 à un usage par session hors budget, inscrit dans la Constitution.",
     "Plafonner tout mandat à 3 renouvellements et créer un vrai statut de l'élu, avec reconversion.",
     "Publier en ligne les agendas des ministres et tous les rendez-vous de lobbying, sous 30 jours.",
     "Ouvrir le vote à 16 ans et compter le vote blanc, avec un parcours civique renforcé au lycée.",
@@ -328,7 +326,7 @@ const PILLARS = [
     "Appliquer la règle « une norme créée, deux supprimées », comptabilité publique tenue par le Conseil d'État.",
     "Supprimer ou fusionner un tiers des 1 200 agences et opérateurs de l'État d'ici 2032.",
     "Généraliser le droit à l'erreur : première erreur de bonne foi jamais sanctionnée, partout.",
-    "Ne plus jamais redemander un document que l'administration possède déjà — dès 2028.",
+    "Ne plus jamais redemander un document que l'administration possède déjà, dès 2028.",
     "Rendre le silence de l'administration favorable : pas de réponse dans le délai légal = accord.",
     "Imposer aux hauts fonctionnaires une mobilité de terrain et une part de rémunération aux résultats.",
     "Voter le budget de l'État sur 3 ans pour sortir de la navigation à vue.",
@@ -363,12 +361,12 @@ const PILLARS = [
     "Garantir un service public de l'État à moins de 20 minutes, avec 80 % des démarches résolues au premier contact.",
     "Couvrir 100 % du territoire en fibre et mobile en 2030, pénalités automatiques pour les opérateurs.",
     "Récompenser financièrement les communes rurales qui créent logements et services.",
-    "Passer sous les 30 000 communes en 2034 par fusion volontaire — incitée, jamais forcée.",
+    "Passer sous les 30 000 communes en 2034 par fusion volontaire, incitée et jamais forcée.",
     "Recentrer chaque contrat État-région sur 3 priorités et publier son taux d'exécution réel.",
     "Ramener la vacance commerciale des villes moyennes sous 9 % d'ici 2032.",
     "Diviser par trois les démissions de maires en donnant aux élus locaux protection, indemnité et respect."]},
   { axis:"II", short:"Finances", title:"Sortir du surendettement", points:[
-    "Ramener le déficit sous 3 % en 5 ans et faire refluer la dette (116 % du PIB) — loi de programmation votée dès l'été 2027.",
+    "Ramener le déficit sous 3 % en 5 ans et faire refluer la dette (116 % du PIB), loi de programmation votée dès l'été 2027.",
     "Porter l'effort aux deux tiers sur la dépense, un tiers sur des recettes ciblées. Pas de hausse générale d'impôts.",
     "Supprimer 30 Md€ de niches fiscales sans effet démontré sur l'emploi ou l'investissement.",
     "Geler en volume les dépenses de fonctionnement de l'État et de ses opérateurs pendant 5 ans.",
@@ -379,7 +377,7 @@ const PILLARS = [
     "Céder 20 Md€ d'actifs non stratégiques : participations et immobilier sans mission de service public.",
     "Reverser chaque euro économisé sur les intérêts de la dette (67 Md€/an aujourd'hui) à l'école et la recherche."]},
   { axis:"II", short:"Travail", title:"Le plein emploi", points:[
-    "Atteindre 72 % de taux d'emploi en 2034 — le niveau allemand — soit 1,5 million d'actifs en plus.",
+    "Atteindre 72 % de taux d'emploi en 2034, le niveau allemand, soit 1,5 million d'actifs en plus.",
     "Baisser le coût du travail entre 1,3 et 2,5 SMIC pour que les salaires moyens décollent enfin.",
     "Garantir que chaque heure travaillée rapporte toujours plus que l'inactivité, en lissant les sorties d'aides.",
     "Faire travailler les seniors : index contraignant, cumul emploi-retraite libre, retraite progressive de droit.",
@@ -399,7 +397,7 @@ const PILLARS = [
     "Flécher l'épargne des Français vers nos ETI et deeptechs via un fonds souverain.",
     "Créer 10 instituts recherche-industrie type Fraunhofer, cofinancés public-privé.",
     "Bloquer toute prédation étrangère sur nos actifs stratégiques.",
-    "Produire en France nos médicaments essentiels, semi-conducteurs et batteries — objectifs chiffrés par filière."]},
+    "Produire en France nos médicaments essentiels, semi-conducteurs et batteries, avec des objectifs chiffrés par filière."]},
   { axis:"II", short:"PME", title:"Libérer les entrepreneurs", points:[
     "Soumettre toute loi économique à un test PME obligatoire avant son vote.",
     "Lisser les seuils de 11 et 50 salariés sur 5 ans : embaucher ne doit plus faire peur.",
@@ -435,7 +433,7 @@ const PILLARS = [
     "Éradiquer le sans-abrisme des familles avec enfants d'ici 2032. Zéro enfant à la rue."]},
   { axis:"II", short:"Agriculture", title:"Nourrir la France", points:[
     "Garantir le revenu paysan : Egalim contrôlée et sanctionnée, prix planchers en cas de crise.",
-    "Installer 20 000 agriculteurs par an — portage foncier et dotation jeune doublée.",
+    "Installer 20 000 agriculteurs par an : portage foncier et dotation jeune doublée.",
     "Reconquérir nos protéines, fruits et légumes : plan de production par filière déficitaire.",
     "Payer les services environnementaux rendus par les agriculteurs : eau, carbone, biodiversité.",
     "Un seul contrôle coordonné par an et par ferme, droit à l'erreur garanti.",
@@ -446,7 +444,7 @@ const PILLARS = [
     "Sortir des pratiques d'élevage les plus contestées, en accompagnant financièrement chaque éleveur."]},
   { axis:"III", short:"Primaire", title:"Tout se joue au primaire", points:[
     "Investir en priorité absolue dans le primaire, aujourd'hui sous-financé de 10 % par rapport à l'OCDE.",
-    "Garantir que 100 % des élèves lisent couramment en fin de CE2 — mesuré et publié chaque année.",
+    "Garantir que 100 % des élèves lisent couramment en fin de CE2, mesuré et publié chaque année.",
     "Généraliser les méthodes qui marchent : lecture syllabique structurée, maths explicites façon Singapour.",
     "Dédoubler toutes les classes de GS, CP et CE1 en éducation prioritaire et rurale.",
     "Augmenter les enseignants de 15 % sur le mandat, garantir le remplacement dès le premier jour.",
@@ -471,7 +469,7 @@ const PILLARS = [
     "Aligner les salaires des chercheurs sur l'OCDE : arrêter d'exporter nos cerveaux.",
     "Rendre un tiers de leur temps aux chercheurs en supprimant la bureaucratie des appels à projets.",
     "Financer les universités sur contrats pluriannuels avec une vraie autonomie de gestion.",
-    "Doubler les places en santé, ingénierie, IA — et publier les débouchés réels de chaque filière.",
+    "Doubler les places en santé, ingénierie et IA, et publier les débouchés réels de chaque filière.",
     "Garantir tutorat et remise à niveau en licence : la fac ne doit plus être un tri par l'abandon.",
     "Pérenniser le repas à 1 € pour les boursiers, un psychologue sur chaque campus.",
     "Lier chaque euro de recherche publique à des objectifs de transfert vers l'économie.",
@@ -481,10 +479,10 @@ const PILLARS = [
     "Investir 30 Md€ en 7 ans dans l'IA (1 % du PIB, deux tiers privés), pilotés depuis Matignon.",
     "Réserver la moitié des nouveaux contrats publics d'IA et de cloud à des acteurs européens d'ici 2030.",
     "Multiplier par 5 notre puissance de calcul d'ici 2032, branchée sur le nucléaire, permis en 12 mois.",
-    "Libérer 30 % de temps administratif aux profs, infirmiers et policiers grâce à l'IA — mesuré sur le terrain.",
+    "Libérer 30 % de temps administratif aux profs, infirmiers et policiers grâce à l'IA, mesuré sur le terrain.",
     "Former 100 000 spécialistes IA d'ici 2032, et les garder : 8 sur 10 employés en France.",
     "Créer un droit à la reconversion activé en 3 mois pour tout métier bouleversé par l'IA.",
-    "Imposer la vérification d'âge réelle sur les plateformes en 2029 — et prononcer les sanctions.",
+    "Imposer la vérification d'âge réelle sur les plateformes en 2029, et prononcer les sanctions.",
     "Héberger 100 % des données de santé et de l'État sous droit européen d'ici 2030. Zéro exception.",
     "Offrir aux startups une mise en conformité en 30 jours : un guichet, un coût plafonné.",
     "Publier le registre de toutes les IA utilisées par l'État ; hors registre, usage interdit. Scoring social banni."]},
@@ -564,7 +562,7 @@ const PILLARS = [
     "Appliquer la transparence salariale intégrale femmes-hommes et financer la lutte contre les violences à hauteur du besoin.",
     "Rendre transports, écoles et emplois réellement accessibles aux personnes handicapées, échéancier contraignant, AESH statutaires.",
     "Appliquer la laïcité fermement et également, partout, pour tous.",
-    "Enseigner toute l'histoire de France, y compris coloniale — sans repentance ni déni."]},
+    "Enseigner toute l'histoire de France, y compris coloniale, sans repentance ni déni."]},
   { axis:"V", short:"Énergie", title:"L'énergie de la souveraineté", points:[
     "Engager 6 EPR2 fermes et 8 en option, accélérer les petits réacteurs, prolonger le parc sûr.",
     "Déployer le solaire sur toitures et friches d'abord, planifier l'éolien en mer façade par façade.",
@@ -651,7 +649,7 @@ const EN = [
     "Elect 30% of MPs by proportional representation from 2028, so every vote counts.",
     "Create a citizens' initiative referendum: 1 million signatures, constitutional review, guaranteed vote.",
     "Act on every citizens' convention proposal: a reasoned parliamentary answer within 6 months, or a vote.",
-    "Limit the 49.3 override to once per session outside the budget — written into the Constitution.",
+    "Limit the 49.3 override to once per session outside the budget, written into the Constitution.",
     "Cap every mandate at 3 renewals and create a real status for elected officials, with career transition.",
     "Publish ministers' diaries and every lobbying meeting online within 30 days.",
     "Open voting at 16 and count blank ballots, with strengthened civic education in high school.",
@@ -662,7 +660,7 @@ const EN = [
     "Apply the rule \"one norm created, two removed\", with a public ledger kept by the Conseil d'État.",
     "Cut or merge a third of the state's 1,200 agencies and operators by 2032.",
     "Generalise the right to error: a first good-faith mistake never sanctioned, anywhere.",
-    "Never again ask for a document the administration already holds — from 2028.",
+    "Never again ask for a document the administration already holds, from 2028.",
     "Make administrative silence favourable: no answer within the legal deadline means approval.",
     "Require senior civil servants to serve in the field, with part of their pay tied to results.",
     "Vote the state budget over 3 years to end year-to-year improvisation.",
@@ -697,12 +695,12 @@ const EN = [
     "Guarantee a state public service within 20 minutes, with 80% of procedures resolved at first contact.",
     "Cover 100% of the territory with fibre and mobile by 2030, with automatic penalties for operators.",
     "Financially reward rural municipalities that create housing and services.",
-    "Fall below 30,000 municipalities by 2034 through voluntary mergers — encouraged, never forced.",
+    "Fall below 30,000 municipalities by 2034 through voluntary mergers, encouraged and never forced.",
     "Refocus every state-region contract on 3 priorities and publish its real delivery rate.",
     "Bring commercial vacancy in mid-size towns below 9% by 2032.",
     "Cut mayoral resignations threefold by giving local officials protection, pay and respect."]},
   { short:"Finances", title:"Out of over-indebtedness", points:[
-    "Bring the deficit below 3% in 5 years and turn the debt (116% of GDP) downward — programming law voted by summer 2027.",
+    "Bring the deficit below 3% in 5 years and turn the debt (116% of GDP) downward, with a programming law voted by summer 2027.",
     "Put two-thirds of the effort on spending, one-third on targeted revenue. No general tax rise.",
     "Scrap €30bn of tax loopholes with no proven effect on jobs or investment.",
     "Freeze state and operator running costs in volume for 5 years.",
@@ -713,7 +711,7 @@ const EN = [
     "Sell €20bn of non-strategic assets: holdings and property with no public service mission.",
     "Return every euro saved on debt interest (€67bn/yr today) to schools and research."]},
   { short:"Work", title:"Full employment", points:[
-    "Reach a 72% employment rate by 2034 — the German level — meaning 1.5 million more people in work.",
+    "Reach a 72% employment rate by 2034, the German level, meaning 1.5 million more people in work.",
     "Cut labour costs between 1.3 and 2.5× the minimum wage so middle wages finally rise.",
     "Guarantee that every hour worked always pays more than inactivity, by smoothing benefit phase-outs.",
     "Get seniors working: a binding index, free work-pension combination, progressive retirement as a right.",
@@ -733,7 +731,7 @@ const EN = [
     "Channel French savings toward our mid-caps and deeptech through a sovereign fund.",
     "Create 10 Fraunhofer-style research-industry institutes, co-funded public-private.",
     "Block all foreign predation on our strategic assets.",
-    "Make our essential medicines, semiconductors and batteries in France — quantified targets per sector."]},
+    "Make our essential medicines, semiconductors and batteries in France, with quantified targets per sector."]},
   { short:"SMEs", title:"Set entrepreneurs free", points:[
     "Subject every economic law to a mandatory SME test before it is voted.",
     "Smooth the 11 and 50-employee thresholds over 5 years: hiring must stop being frightening.",
@@ -769,7 +767,7 @@ const EN = [
     "Eradicate homelessness for families with children by 2032. No child on the street."]},
   { short:"Agriculture", title:"Feeding France", points:[
     "Guarantee farm income: Egalim enforced and sanctioned, floor prices in times of crisis.",
-    "Set up 20,000 farmers a year — land carry and doubled young-farmer grant.",
+    "Set up 20,000 farmers a year: land carry and a doubled young-farmer grant.",
     "Win back our proteins, fruit and vegetables: a production plan for every deficit sector.",
     "Pay farmers for the environmental services they provide: water, carbon, biodiversity.",
     "One coordinated inspection per year per farm, with a guaranteed right to error.",
@@ -779,8 +777,8 @@ const EN = [
     "Serve 100% sustainable in canteens and create a food voucher for fresh French produce.",
     "Phase out the most contested livestock practices, supporting every farmer financially."]},
   { short:"Primary school", title:"It is all decided in primary school", points:[
-    "Make primary school the absolute investment priority — currently underfunded by 10% against the OECD.",
-    "Guarantee that 100% of pupils read fluently by age 8 — measured and published every year.",
+    "Make primary school the absolute investment priority, currently underfunded by 10% against the OECD.",
+    "Guarantee that 100% of pupils read fluently by age 8, measured and published every year.",
     "Generalise what works: structured phonics, explicit Singapore-style maths.",
     "Halve class sizes in all early-primary years in priority and rural education.",
     "Raise teacher pay by 15% over the term, guarantee cover from the first day of absence.",
@@ -805,7 +803,7 @@ const EN = [
     "Align researcher salaries with the OECD: stop exporting our brains.",
     "Give researchers back a third of their time by cutting grant-application bureaucracy.",
     "Fund universities on multi-year contracts with real management autonomy.",
-    "Double places in health, engineering and AI — and publish real job outcomes for every course.",
+    "Double places in health, engineering and AI, and publish real job outcomes for every course.",
     "Guarantee tutoring and catch-up in undergraduate years: university must stop sorting by dropout.",
     "Make the €1 meal permanent for grant-holders, with a psychologist on every campus.",
     "Tie every euro of public research to transfer objectives toward the economy.",
@@ -815,10 +813,10 @@ const EN = [
     "Invest €30bn over 7 years in AI (1% of GDP, two-thirds private), steered from the prime minister's office.",
     "Reserve half of new public AI and cloud contracts for European providers by 2030.",
     "Multiply our computing power fivefold by 2032, plugged into nuclear, permits in 12 months.",
-    "Free up 30% of admin time for teachers, nurses and police through AI — measured in the field.",
+    "Free up 30% of admin time for teachers, nurses and police through AI, measured in the field.",
     "Train 100,000 AI specialists by 2032, and keep them: 8 in 10 employed in France.",
     "Create a right to retraining activated within 3 months for any job disrupted by AI.",
-    "Impose real age verification on platforms by 2029 — and actually issue the sanctions.",
+    "Impose real age verification on platforms by 2029, and actually issue the sanctions.",
     "Host 100% of health and state data under European law by 2030. Zero exceptions.",
     "Offer startups compliance in 30 days: one desk, a capped cost.",
     "Publish the register of every AI used by the state; unregistered means banned. Social scoring outlawed."]},
@@ -898,7 +896,7 @@ const EN = [
     "Apply full gender pay transparency and fund the fight against violence to the level of actual need.",
     "Make transport, schools and jobs genuinely accessible to disabled people, with a binding timetable and permanent status for school aides.",
     "Apply secularism firmly and equally, everywhere, for everyone.",
-    "Teach all of French history, including the colonial period — without repentance or denial."]},
+    "Teach all of French history, including the colonial period, without repentance or denial."]},
   { short:"Energy", title:"The energy of sovereignty", points:[
     "Commit to 6 firm EPR2 reactors and 8 optional, accelerate small reactors, extend the safe fleet.",
     "Deploy solar on rooftops and brownfields first, plan offshore wind coast by coast.",
@@ -979,13 +977,13 @@ const EN = [
 ];
 
 const UI = {
-  fr: { title: "Programme présidentiel", total: "Programme total", unit: "Md€ / an", foot: "Chiffrage 2034 — annexe", axe: "Axe", pilier: "Pilier",
+  fr: { title: "Programme présidentiel", total: "Programme total", unit: "Md€ / an", axe: "Axe", pilier: "Pilier",
         cost: "Coût brut", gain: "Recettes & économies" },
-  en: { title: "Presidential programme", total: "Total programme", unit: "€bn / yr", foot: "2034 costing — annex", axe: "Axis", pilier: "Pillar",
+  en: { title: "Presidential programme", total: "Total programme", unit: "€bn / yr", axe: "Axis", pilier: "Pillar",
         cost: "Gross cost", gain: "Revenue & savings" }
 };
 // Sources: institutions and documents cited in the programme + costing annex.
-// This site renders those documents — it did not independently audit them.
+// This site renders those documents; it did not independently audit them.
 const SOURCES = {
   fr: {
     btn: "Sources",
@@ -998,11 +996,11 @@ const SOURCES = {
         "Impôt minimal mondial OCDE / G20",
         "Loi Egalim ; pacte européen asile-migration ; mécanisme carbone aux frontières" ] },
       { h: "Institutions de contrôle mobilisées", items: [
-        "Conseil d'État — comptabilité publique des normes",
-        "Haut Conseil des finances publiques — pouvoir d'alerte",
+        "Conseil d'État : comptabilité publique des normes",
+        "Haut Conseil des finances publiques : pouvoir d'alerte",
         "Office français de la biodiversité ; ANSSI ; France Travail" ] },
       { h: "Design", items: [
-        "Marianne — caractère typographique de l'État (DSFR)" ] }
+        "Marianne, caractère typographique de l'État (DSFR)" ] }
     ],
     note: "Ces références sont celles citées dans les documents du programme et son annexe de chiffrage. Ce site les restitue ; il ne les a pas auditées indépendamment. Les montants sont des estimations à horizon 2034, pas des prévisions."
   },
@@ -1017,11 +1015,11 @@ const SOURCES = {
         "OECD / G20 global minimum tax",
         "Egalim law; European asylum and migration pact; carbon border mechanism" ] },
       { h: "Oversight institutions relied on", items: [
-        "Conseil d'État — public ledger of norms",
-        "High Council of Public Finance — alert powers",
+        "Conseil d'État : public ledger of norms",
+        "High Council of Public Finance : alert powers",
         "French Biodiversity Agency; national cybersecurity agency; France Travail" ] },
       { h: "Design", items: [
-        "Marianne — the French state typeface (DSFR)" ] }
+        "Marianne, the French state typeface (DSFR)" ] }
     ],
     note: "These references are the ones cited in the programme documents and its costing annex. This site renders them; it has not independently audited them. Figures are 2034 estimates, not forecasts."
   }
@@ -1084,7 +1082,7 @@ function resize() {
   canvas.width = W * DPR; canvas.height = H * DPR;
   canvas.style.width = W + "px"; canvas.style.height = H + "px";
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  CX = W / 2; CY = H * 0.58; // sphere sits lower — header breathes
+  CX = W / 2; CY = H * 0.58; // sphere sits lower, header breathes
   R = Math.min(W, H) * 0.34;
 }
 window.addEventListener("resize", resize);
@@ -1129,7 +1127,7 @@ const nodes = [];
     });
   });
 }
-// decorative nodes — on the sphere surface, filling the gaps
+// decorative nodes: on the sphere surface, filling the gaps
 for (let i = 0; i < 70; i++) {
   const p = fib(i, 70);
   const j = 0.18;
@@ -1152,7 +1150,7 @@ const edges = [];
     const k = a.pillar >= 0 ? 2 : 8; // dense mesh between deco nodes, light anchoring for pillars
     for (let n = 0; n < k; n++) add(ia, dists[n].ib);
   });
-  // pillars of the same axe: perimeter ring only (no hub spokes — too messy)
+  // pillars of the same axe: perimeter ring only (no hub spokes, too messy)
   const byAxe = {};
   PILLARS.forEach((p, i) => (byAxe[p.axis] = byAxe[p.axis] || []).push(i));
   Object.values(byAxe).forEach(m => {
@@ -1241,7 +1239,7 @@ canvas.addEventListener("pointermove", e => {
   moved += Math.abs(dx) + Math.abs(dy);
   lastX = e.clientX; lastY = e.clientY;
   anim = null;
-  // rotate about screen axes — unbounded in every direction
+  // rotate about screen axes, unbounded in every direction
   const d = qmul(qaxis(0, 1, 0, dx * 0.005), qaxis(1, 0, 0, dy * 0.005));
   q = qnorm(qmul(d, q));
 });
@@ -1258,7 +1256,7 @@ function select(i) {
   const dot = Math.max(-1, Math.min(1, c.z));           // dot(c, front)
   let r;
   if (dot > 0.99999) r = [1, 0, 0, 0];                  // already facing us
-  else if (dot < -0.99999) r = qaxis(0, 1, 0, Math.PI); // antipodal — any perpendicular axis
+  else if (dot < -0.99999) r = qaxis(0, 1, 0, Math.PI); // antipodal, any perpendicular axis
   else {
     const ax = c.y, ay = -c.x, az = 0;                  // cross(c, front)
     const l = Math.hypot(ax, ay, az);
@@ -1302,7 +1300,6 @@ function applyLang(l) {
   gGain.textContent = fmtVal(curGain);
   document.getElementById("gCostTag").textContent = UI[l].cost;
   document.getElementById("gGainTag").textContent = UI[l].gain;
-  document.querySelector(".c-foot").textContent = UI[l].foot;
   const S = SOURCES[l];
   document.getElementById("sBtn").textContent = S.btn;
   document.getElementById("sPop").innerHTML =
