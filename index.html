@@ -197,6 +197,36 @@
     font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--mute); margin-bottom: 10px;
   }
+
+  /* reliability index */
+  .rel {
+    display: inline-flex; align-items: center; gap: 6px;
+    font-size: 9px; letter-spacing: 0.07em; text-transform: uppercase;
+    padding: 4px 9px 5px; margin-bottom: 12px;
+    border: 1px solid; border-radius: 3px;
+    position: relative; cursor: help; user-select: none;
+  }
+  .rel .pips { display: inline-flex; gap: 3px; }
+  .rel .pips i {
+    width: 5px; height: 5px; border-radius: 50%;
+    background: currentColor; opacity: 0.22;
+  }
+  .rel .pips i.on { opacity: 1; }
+  .rel.r3 { color: #3f6b4d; border-color: #c3d5c8; background: #eef3ef; }
+  .rel.r2 { color: #8a6a24; border-color: #e0d5b8; background: #f5f1e6; }
+  .rel.r1 { color: #9a5340; border-color: #e4cdc5; background: #f7eeea; }
+  .rel::after {
+    content: attr(data-tip);
+    position: absolute; top: calc(100% + 7px); left: 0;
+    white-space: normal; width: max-content; max-width: 250px; line-height: 1.4;
+    text-transform: none; letter-spacing: 0;
+    font-size: 10.5px; padding: 7px 10px;
+    background: #161616; color: #f7f6f2; border-radius: 3px;
+    opacity: 0; visibility: hidden; transform: translateY(-3px);
+    transition: opacity 0.16s ease, transform 0.16s ease, visibility 0.16s;
+    z-index: 5; pointer-events: none;
+  }
+  .rel:hover::after { opacity: 1; visibility: visible; transform: translateY(0); }
   .panel h1 {
     font-size: 21px; font-weight: 600; letter-spacing: -0.02em;
     line-height: 1.15; margin-bottom: 26px; padding-right: 20px;
@@ -248,6 +278,7 @@
   <aside class="panel" id="panel">
     <button class="close" id="panelClose" aria-label="Fermer">✕</button>
     <div class="eyebrow" id="pEyebrow"></div>
+    <div id="pRel"></div>
     <h1 id="pTitle"></h1>
     <ol class="points" id="pPoints"></ol>
   </aside>
@@ -922,9 +953,17 @@ const EN = [
 
 const UI = {
   fr: { title: "Programme présidentiel", total: "Programme total", unit: "Md€ / an", foot: "Chiffrage 2034 — annexe", axe: "Axe", pilier: "Pilier",
-        cost: "Coût brut", gain: "Recettes & économies" },
+        cost: "Coût brut", gain: "Recettes & économies",
+        rel: "Fiabilité", relNames: ["faible", "moyenne", "forte"],
+        relTips: ["Fiabilité du chiffrage : faible confiance — repose sur des effets retour comportementaux",
+                  "Fiabilité du chiffrage : confiance moyenne — ordre de grandeur raisonnable",
+                  "Fiabilité du chiffrage : forte confiance — consensus des chiffrages existants"] },
   en: { title: "Presidential programme", total: "Total programme", unit: "€bn / yr", foot: "2034 costing — annex", axe: "Axis", pilier: "Pillar",
-        cost: "Gross cost", gain: "Revenue & savings" }
+        cost: "Gross cost", gain: "Revenue & savings",
+        rel: "Reliability", relNames: ["low", "medium", "high"],
+        relTips: ["Costing reliability: low confidence — rests on behavioural feedback effects",
+                  "Costing reliability: medium confidence — reasonable order of magnitude",
+                  "Costing reliability: high confidence — consensus of existing costings"] }
 };
 // Sources: institutions and documents cited in the programme + costing annex.
 // This site renders those documents — it did not independently audit them.
@@ -986,6 +1025,9 @@ function L(i) { return lang === "en" ? EN[i] : PILLARS[i]; }
 const COST = [0.3,1,9,4,2,   0,8,6,2,5,   5,3,   6,4,8,4,1.5,   8,10,6,5,4,3,   2,15,4,   32,1,2,3];
 const GAIN = [0,25,0.5,1.5,2, 85,45,10,3,13, 4,0.5, 0,1,0,5,0,   4,0,2,1,10,0,   0,1,0,    3,0,1.5,0];
 const SPEND = COST;
+// Reliability of each pillar's costing, from the annex: 1 = ★ (bet on behavioural
+// feedback effects), 2 = ★★ (reasonable order of magnitude), 3 = ★★★ (consensus).
+const REL = [3,2,3,3,2,  2,1,1,2,2,2,3,  3,3,3,1,3,  2,3,2,3,2,3,  2,2,3,  3,2,2,3];
 const TOTAL = SPEND.reduce((a,b)=>a+b, 0);
 
 // ================= spend counter =================
@@ -1227,6 +1269,12 @@ function select(i) {
 }
 function fillPanel(i) {
   const pl = L(i);
+  const r = REL[i];
+  document.getElementById("pRel").innerHTML =
+    '<span class="rel r' + r + '" data-tip="' + UI[lang].relTips[r - 1] + '">' +
+    '<span class="pips">' +
+      [1, 2, 3].map(n => '<i class="' + (n <= r ? "on" : "") + '"></i>').join("") +
+    '</span>' + UI[lang].rel + (lang === "fr" ? " : " : ": ") + UI[lang].relNames[r - 1] + '</span>';
   document.getElementById("pEyebrow").textContent = UI[lang].axe + " " + PILLARS[i].axis + " · " + UI[lang].pilier + " " + (i + 1);
   document.getElementById("pTitle").textContent = pl.title;
   document.getElementById("pPoints").innerHTML = pl.points.map(pt => "<li>" + pt + "</li>").join("");
