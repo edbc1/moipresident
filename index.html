@@ -191,23 +191,6 @@
     transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
   .panel.open { transform: translateX(0); }
-  /* collapse control, on the panel's left edge */
-  /* Collapse control. Lives OUTSIDE .panel: the panel scrolls (overflow-y:auto)
-     and would clip anything sitting beyond its own edge. */
-  .collapse {
-    position: fixed; top: 30px; right: calc(var(--panel-w) + 14px); z-index: 55;
-    width: 24px; height: 24px; padding: 0;
-    display: flex; align-items: center; justify-content: center;
-    background: none; border: none;
-    cursor: pointer; color: var(--mute);
-    opacity: 0; pointer-events: none;
-    transform: translateX(calc(var(--panel-w) + 40px));
-    transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1),
-                opacity 0.3s ease, color 0.18s ease;
-  }
-  .collapse.open { opacity: 0.45; pointer-events: auto; transform: translateX(0); }
-  .collapse.open:hover { opacity: 1; color: var(--ink); }
-  .collapse svg { width: 14px; height: 14px; display: block; }
   .panel .eyebrow {
     font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--mute); margin-bottom: 10px;
@@ -320,13 +303,6 @@
     </div>
     <div class="c-foot">Estimations illustratives</div>
   </div>
-
-  <button class="collapse" id="panelClose" aria-label="Réduire le panneau">
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.4"
-         stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-      <path d="M6 3.5 L10.5 8 L6 12.5"/>
-    </svg>
-  </button>
 
   <aside class="panel" id="panel">
     <div class="eyebrow" id="pEyebrow"></div>
@@ -1293,7 +1269,6 @@ function select(i) {
   fillPanel(i);
   const pnl = document.getElementById("panel");
   pnl.classList.add("open");
-  document.getElementById("panelClose").classList.add("open");
   pnl.scrollTop = 0;
   counterEl.classList.remove("hidden");
   setCounter(L(i).title, COST[i], true, GAIN[i]);
@@ -1309,7 +1284,6 @@ function fillPanel(i) {
 function closePanel() {
   sel = null; anim = null;
   document.getElementById("panel").classList.remove("open");
-  document.getElementById("panelClose").classList.remove("open");
   document.getElementById("panel").scrollTop = 0;
   counterEl.classList.remove("hidden");
   setCounter(UI[lang].total, TOTAL, false, TOTAL_GAIN);
@@ -1331,9 +1305,6 @@ function applyLang(l) {
   document.querySelector(".c-foot").textContent = UI[l].foot;
   const S = SOURCES[l];
   document.getElementById("sBtn").textContent = S.btn;
-  const cb = document.getElementById("panelClose");
-  cb.setAttribute("aria-label", l === "fr" ? "Réduire le panneau" : "Collapse panel");
-  cb.setAttribute("title", l === "fr" ? "Réduire" : "Collapse");
   document.getElementById("sPop").innerHTML =
     S.groups.map(g => "<h4>" + g.h + "</h4><ul>" +
       g.items.map(it => "<li>" + it + "</li>").join("") + "</ul>").join("") +
@@ -1343,7 +1314,6 @@ function applyLang(l) {
   else cLabel.textContent = UI[l].total;
 }
 langBtn.addEventListener("click", () => applyLang(lang === "fr" ? "en" : "fr"));
-document.getElementById("panelClose").addEventListener("click", closePanel);
 
 // hide the counter once the panel scrolls under it
 const panelEl = document.getElementById("panel");
