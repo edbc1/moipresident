@@ -93,7 +93,8 @@
   .lang:hover { border-bottom-color: var(--ink); }
 
   /* sources */
-  .sources { position: fixed; bottom: 30px; right: 36px; z-index: 60; }
+  /* below the panel (z 50) so an open panel covers it */
+  .sources { position: fixed; bottom: 30px; right: 36px; z-index: 45; }
   .sources .s-btn {
     font-family: inherit; font-size: 11px; letter-spacing: 0.08em;
     color: var(--ink); padding: 4px 0; cursor: default;
@@ -189,13 +190,21 @@
     transition: transform 0.45s cubic-bezier(0.22, 0.61, 0.36, 1);
   }
   .panel.open { transform: translateX(0); }
+  /* collapse control, on the panel's left edge */
   .panel .close {
-    position: absolute; top: 152px; right: 30px;
-    background: none; border: none; cursor: pointer;
-    font-size: 18px; color: var(--mute); line-height: 1;
-    font-family: inherit;
+    /* position:fixed inside the transformed .panel resolves against the panel
+       itself, so the control stays pinned while the content scrolls */
+    position: fixed; top: 50%; left: 0;
+    transform: translateY(-50%);
+    width: 28px; height: 68px; padding: 0;
+    display: flex; align-items: center; justify-content: center;
+    background: rgba(0, 0, 0, 0.02); border: none;
+    border-right: 1px solid var(--line);
+    cursor: pointer; color: var(--mute);
+    transition: color 0.15s ease, background 0.15s ease;
   }
-  .panel .close:hover { color: var(--ink); }
+  .panel .close:hover { color: var(--ink); background: rgba(0, 0, 0, 0.055); }
+  .panel .close svg { width: 14px; height: 14px; display: block; }
   .panel .eyebrow {
     font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
     color: var(--mute); margin-bottom: 10px;
@@ -310,7 +319,13 @@
   </div>
 
   <aside class="panel" id="panel">
-    <button class="close" id="panelClose" aria-label="Fermer">✕</button>
+    <button class="close" id="panelClose" aria-label="Réduire le panneau">
+      <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.6"
+           stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M4.5 3.5 L9 8 L4.5 12.5"/>
+        <path d="M11.5 3 L11.5 13"/>
+      </svg>
+    </button>
     <div class="eyebrow" id="pEyebrow"></div>
     <h1 id="pTitle"></h1>
     <ol class="points" id="pPoints"></ol>
@@ -1007,10 +1022,6 @@ const SOURCES = {
         "Conseil d'État — comptabilité publique des normes",
         "Haut Conseil des finances publiques — pouvoir d'alerte",
         "Office français de la biodiversité ; ANSSI ; France Travail" ] },
-      { h: "Chiffrage", items: [
-        "Annexe de chiffrage pilier par pilier (Md€/an, régime de croisière 2034)",
-        "≈ 160 Md€/an de coût, ≈ 210 Md€/an de financement",
-        "Fiabilité auto-évaluée : ★★★ consensus, ★★ ordre de grandeur, ★ pari sur effets retour" ] },
       { h: "Design", items: [
         "Marianne — caractère typographique de l'État (DSFR)" ] }
     ],
@@ -1030,10 +1041,6 @@ const SOURCES = {
         "Conseil d'État — public ledger of norms",
         "High Council of Public Finance — alert powers",
         "French Biodiversity Agency; national cybersecurity agency; France Travail" ] },
-      { h: "Costing", items: [
-        "Pillar-by-pillar costing annex (€bn/yr, 2034 cruising speed)",
-        "≈ €160bn/yr in cost, ≈ €210bn/yr in financing",
-        "Self-assessed reliability: ★★★ consensus, ★★ order of magnitude, ★ bet on feedback effects" ] },
       { h: "Design", items: [
         "Marianne — the French state typeface (DSFR)" ] }
     ],
@@ -1319,6 +1326,9 @@ function applyLang(l) {
   document.querySelector(".c-foot").textContent = UI[l].foot;
   const S = SOURCES[l];
   document.getElementById("sBtn").textContent = S.btn;
+  const cb = document.getElementById("panelClose");
+  cb.setAttribute("aria-label", l === "fr" ? "Réduire le panneau" : "Collapse panel");
+  cb.setAttribute("title", l === "fr" ? "Réduire" : "Collapse");
   document.getElementById("sPop").innerHTML =
     S.groups.map(g => "<h4>" + g.h + "</h4><ul>" +
       g.items.map(it => "<li>" + it + "</li>").join("") + "</ul>").join("") +
