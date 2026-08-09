@@ -132,6 +132,8 @@
   /* canvas + label layer */
   #scene { position: fixed; inset: 0; cursor: grab; }
   #scene.dragging { cursor: grabbing; }
+  /* a pillar is open: the click target is "close", not "grab" */
+  #scene.focused, #scene.focused .tag { cursor: default; }
   #tags { position: fixed; inset: 0; pointer-events: none; }
   .tag {
     position: absolute; left: 0; top: 0;
@@ -198,10 +200,6 @@
     will-change: transform;
   }
   .panel.open { opacity: 1; visibility: visible; }
-  .panel .eyebrow {
-    font-size: 9px; letter-spacing: 0.08em; text-transform: uppercase;
-    color: var(--mute); margin-bottom: 5px;
-  }
   .panel h1 {
     font-size: 17px; font-weight: 600; letter-spacing: -0.02em;
     line-height: 1.2; margin-bottom: 10px;
@@ -235,6 +233,11 @@
     line-height: 1.3; letter-spacing: -0.02em;
     color: var(--ink); max-width: 18em; text-align: center;
   }
+  /* each line reserves its finished size via a hidden ghost, so the block
+     never grows (and never nudges the line above) as characters land */
+  .intro-text .l1, .intro-text .l2 { position: relative; }
+  .intro-text .ghost { visibility: hidden; }
+  .intro-text .live { position: absolute; left: 0; right: 0; top: 0; }
   .intro-text .l1 {
     font-family: "Instrument Serif", Georgia, "Times New Roman", serif;
     font-style: italic; font-weight: 400;
@@ -282,8 +285,8 @@
 <body class="booting">
   <div class="intro" id="intro">
     <div class="intro-text">
-      <div class="l1"><span id="t1"></span><span class="cur" id="c1"></span></div>
-      <div class="l2"><span id="t2"></span><span class="cur" id="c2"></span></div>
+      <div class="l1"><span class="ghost" id="g1"></span><span class="live"><span id="t1"></span><span class="cur" id="c1"></span></span></div>
+      <div class="l2"><span class="ghost" id="g2"></span><span class="live"><span id="t2"></span><span class="cur" id="c2"></span></span></div>
       <div class="flag" id="flag"><span class="b"></span><span class="w"></span><span class="r"></span></div>
     </div>
   </div>
@@ -313,7 +316,6 @@
   </div>
 
   <aside class="panel" id="panel">
-    <div class="eyebrow" id="pEyebrow"></div>
     <h1 id="pTitle"></h1>
     <ol class="points" id="pPoints"></ol>
   </aside>
@@ -819,13 +821,14 @@ function resize() {
   // Centre the sphere in the band left between the masthead and the bottom row,
   // not in the raw viewport: the header occupies real space at the top.
   const mh = document.querySelector(".masthead");
-  const topEdge = (mh ? mh.getBoundingClientRect().bottom : 60) + 22;
+  // +70 rather than +22: each tag floats ~40px above its own node, so the
+  // painted top of the sphere sits well above R.
+  const topEdge = (mh ? mh.getBoundingClientRect().bottom : 60) + 70;
   const bottomEdge = H - 62;                 // clears the FR / Sources row
   const band = Math.max(120, bottomEdge - topEdge);
   CX = W / 2;
   CY = topEdge + band / 2;
-  // keep the sphere (and its tags) inside that band
-  R = Math.min(W * 0.34, H * 0.34, band * 0.44);
+  R = Math.min(W * 0.32, H * 0.32, band * 0.42);
 }
 window.addEventListener("resize", resize);
 resize();
@@ -1009,6 +1012,7 @@ function select(i) {
   fillPanel(i);
   const pnl = document.getElementById("panel");
   pnl.classList.add("open");
+  canvas.classList.add("focused");
   pnl.scrollTop = 0;
   setCounter(L(i).title, COST[i], true, GAIN[i]);
   markRead(i);
@@ -1016,13 +1020,13 @@ function select(i) {
 }
 function fillPanel(i) {
   const pl = L(i);
-  document.getElementById("pEyebrow").textContent = UI[lang].axe + " " + PILLARS[i].axis + " · " + UI[lang].pilier + " " + (i + 1);
   document.getElementById("pTitle").textContent = pl.title;
   document.getElementById("pPoints").innerHTML = pl.points.map(pt => "<li>" + pt + "</li>").join("");
 }
 function closePanel() {
   sel = null; anim = null;
   document.getElementById("panel").classList.remove("open");
+  canvas.classList.remove("focused");
   document.getElementById("panel").scrollTop = 0;
   setCounter(UI[lang].total, TOTAL, false, TOTAL_GAIN);
   tags.forEach(t => t.classList.remove("sel"));
@@ -1116,7 +1120,7 @@ function frame(now) {
     const M = 16;
     let x = tagRect.left;                    // flush with the tag's left edge
     x = Math.max(M, Math.min(W - pw - M, x));
-    let y = tagRect.bottom + 10;             // hang just under the tag
+    let y = tagRect.bottom + 4;              // hang just under the tag
     if (y + ph > H - M) y = Math.max(M, H - ph - M);
     panelEl.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
   }
@@ -1128,14 +1132,16 @@ applyLang(lang);
 setCounter(UI[lang].total, TOTAL, false, TOTAL_GAIN);
 requestAnimationFrame(frame);
 
-// ---- intro: typewriter, hold 3s, then reveal the sphere ----
+// ---- intro: typewriter, hold 2s, then reveal the sphere ----
 (function intro() {
   const L1 = "Claude,";
   const L2 = "Que ferais-tu si tu étais élu président en 2027 ?";
-  const SPEED = 52, HOLD = 3000;
+  const SPEED = 52, HOLD = 2000;
   const introEl = document.getElementById("intro");
   const t1 = document.getElementById("t1"), t2 = document.getElementById("t2");
   const c1 = document.getElementById("c1"), c2 = document.getElementById("c2");
+  document.getElementById("g1").textContent = L1;
+  document.getElementById("g2").textContent = L2;
   let done = false;
   const timers = [];
 
