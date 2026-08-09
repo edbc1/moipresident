@@ -144,7 +144,6 @@
     user-select: none;
   }
   .tag:hover { background: #000; }
-  .tag.sel { outline: 1px solid #161616; outline-offset: 2px; }
   .tag .n { color: #8f8f8f; margin-right: 6px; }
   .tag .tick { display: none; margin-left: 6px; color: #b9b5ab; font-size: 9px; }
   .tag.read .tick { display: inline; }
@@ -817,8 +816,16 @@ function resize() {
   canvas.width = W * DPR; canvas.height = H * DPR;
   canvas.style.width = W + "px"; canvas.style.height = H + "px";
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  CX = W / 2; CY = H / 2; // sphere stays centred
-  R = Math.min(W, H) * 0.34;
+  // Centre the sphere in the band left between the masthead and the bottom row,
+  // not in the raw viewport: the header occupies real space at the top.
+  const mh = document.querySelector(".masthead");
+  const topEdge = (mh ? mh.getBoundingClientRect().bottom : 60) + 22;
+  const bottomEdge = H - 62;                 // clears the FR / Sources row
+  const band = Math.max(120, bottomEdge - topEdge);
+  CX = W / 2;
+  CY = topEdge + band / 2;
+  // keep the sphere (and its tags) inside that band
+  R = Math.min(W * 0.34, H * 0.34, band * 0.44);
 }
 window.addEventListener("resize", resize);
 resize();
@@ -952,6 +959,7 @@ function qslerp(a, b, t) {
 let q = qmul(qaxis(1, 0, 0, -0.18), qaxis(0, 1, 0, 0.6));
 const AUTO = 0.0016;
 let dragging = false, lastX = 0, lastY = 0, moved = 0;
+let dim = 0; // eases to 1 while a pillar is focused
 let sel = null;
 let anim = null; // {q0, q1, t0, dur}
 
@@ -1061,6 +1069,10 @@ function frame(now) {
 
   ctx.clearRect(0, 0, W, H);
 
+  // fade the rest of the sphere back while a pillar is focused
+  dim += ((sel !== null ? 1 : 0) - dim) * 0.09;
+  const fade = 1 - dim * 0.78;
+
   // rotate + project all nodes
   const proj = nodes.map(n => project(rot(n), n.rad));
 
@@ -1068,8 +1080,8 @@ function frame(now) {
   edges.forEach(([a, b]) => {
     const A = proj[a], B = proj[b];
     const zm = (A.z + B.z) / 2;
-    const alpha = zm > 0 ? 0.05 + zm * 0.20 : 0.035 + zm * 0.03;
-    if (alpha <= 0.012) return;
+    const alpha = (zm > 0 ? 0.05 + zm * 0.20 : 0.035 + zm * 0.03) * fade;
+    if (alpha <= 0.008) return;
     ctx.strokeStyle = "rgba(22,22,22," + alpha.toFixed(3) + ")";
     ctx.lineWidth = zm > 0 ? 0.7 : 0.45;
     ctx.beginPath(); ctx.moveTo(A.px, A.py); ctx.lineTo(B.px, B.py); ctx.stroke();
@@ -1079,7 +1091,8 @@ function frame(now) {
   proj.forEach((P, i) => {
     const front = P.z > 0;
     const r = (nodes[i].pillar >= 0 ? 2.6 : 1.7) * P.s;
-    ctx.fillStyle = "rgba(22,22,22," + (front ? 0.28 + P.z * 0.6 : 0.10).toFixed(3) + ")";
+    const al = (front ? 0.28 + P.z * 0.6 : 0.10) * (i === sel ? 1 : fade);
+    ctx.fillStyle = "rgba(22,22,22," + al.toFixed(3) + ")";
     ctx.beginPath(); ctx.arc(P.px, P.py, r, 0, 7); ctx.fill();
   });
 
@@ -1090,7 +1103,8 @@ function frame(now) {
     const front = P.z > -0.15;
     const sc = 0.72 + Math.max(0, P.z) * 0.38;
     el.style.transform = "translate(-50%, -160%) translate(" + P.px.toFixed(1) + "px," + P.py.toFixed(1) + "px) scale(" + sc.toFixed(3) + ")";
-    el.style.opacity = front ? (0.35 + Math.max(0, P.z) * 0.65).toFixed(2) : "0.07";
+    const base = front ? 0.35 + Math.max(0, P.z) * 0.65 : 0.07;
+    el.style.opacity = (i === sel ? 1 : base * fade).toFixed(3);
     el.style.pointerEvents = front ? "auto" : "none";
     el.style.zIndex = String(100 + Math.round(P.z * 100));
   }
