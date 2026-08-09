@@ -996,14 +996,23 @@ canvas.addEventListener("pointerup", e => {
 // --- select / close ---
 function select(i) {
   sel = i;
-  // target: shortest rotation bringing this node to the front (0,0,1)
+  // Aim the pillar up and to the left of centre rather than dead front: the
+  // window hangs below the tag and extends to its right, so an off-centre
+  // pillar is what leaves the window itself near the middle of the screen.
+  const AIM_X = 0.45, AIM_Y = 0.43;
+  const tl = Math.hypot(AIM_X, AIM_Y, 1);
+  const T = { x: -AIM_X / tl, y: AIM_Y / tl, z: 1 / tl };
+
+  // shortest rotation bringing this node onto T
   const c = qapply(q, nodes[i]);
-  const dot = Math.max(-1, Math.min(1, c.z));           // dot(c, front)
+  const dot = Math.max(-1, Math.min(1, c.x * T.x + c.y * T.y + c.z * T.z));
   let r;
-  if (dot > 0.99999) r = [1, 0, 0, 0];                  // already facing us
+  if (dot > 0.99999) r = [1, 0, 0, 0];                  // already there
   else if (dot < -0.99999) r = qaxis(0, 1, 0, Math.PI); // antipodal, any perpendicular axis
   else {
-    const ax = c.y, ay = -c.x, az = 0;                  // cross(c, front)
+    const ax = c.y * T.z - c.z * T.y,                   // cross(c, T)
+          ay = c.z * T.x - c.x * T.z,
+          az = c.x * T.y - c.y * T.x;
     const l = Math.hypot(ax, ay, az);
     r = qaxis(ax / l, ay / l, az / l, Math.acos(dot));
   }
