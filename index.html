@@ -231,7 +231,7 @@
   .intro-text {
     font-size: clamp(22px, 3.4vw, 40px);
     line-height: 1.3; letter-spacing: -0.02em;
-    color: var(--ink); max-width: 18em; text-align: center;
+    color: var(--ink); max-width: 26em; text-align: center;
   }
   /* each line reserves its finished size via a hidden ghost, so the block
      never grows (and never nudges the line above) as characters land */
@@ -828,7 +828,7 @@ function resize() {
   const band = Math.max(120, bottomEdge - topEdge);
   CX = W / 2;
   CY = topEdge + band / 2;
-  R = Math.min(W * 0.32, H * 0.32, band * 0.42);
+  R = Math.min(W * 0.34, H * 0.34, band * 0.44);
 }
 window.addEventListener("resize", resize);
 resize();
@@ -1144,7 +1144,8 @@ requestAnimationFrame(frame);
 // ---- intro: typewriter, hold 2s, then reveal the sphere ----
 (function intro() {
   const L1 = "Claude,";
-  const L2 = "Que ferais-tu si tu étais élu président en 2027 ?";
+  // non-breaking spaces so "en 2027 ?" can never orphan onto its own line
+  const L2 = "Que ferais-tu si tu étais élu président en\u00A02027\u00A0?";
   const SPEED = 52, HOLD = 2000;
   const introEl = document.getElementById("intro");
   const t1 = document.getElementById("t1"), t2 = document.getElementById("t2");
