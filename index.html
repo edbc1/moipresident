@@ -126,7 +126,17 @@
   }
   .s-pop h4:not(:first-child) { margin-top: 14px; }
   .s-pop ul { list-style: none; }
-  .s-pop li { font-size: 11px; line-height: 1.5; color: #3a3733; padding: 2px 0; }
+  .s-pop li { font-size: 11px; line-height: 1.5; padding: 3px 0; }
+  .s-pop li a {
+    color: #3a3733; text-decoration: none;
+    border-bottom: 1px solid rgba(58, 55, 51, 0.22);
+    transition: color 0.15s ease, border-color 0.15s ease;
+  }
+  .s-pop li a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+  .s-pop li a::after {
+    content: "↗"; font-size: 8px; margin-left: 4px;
+    color: var(--mute); vertical-align: 1px;
+  }
   .s-pop .note {
     font-size: 10px; line-height: 1.5; color: var(--mute);
     margin-top: 14px; padding-top: 10px; border-top: 1px solid var(--line);
@@ -993,23 +1003,43 @@ const UI = {
 };
 // Sources: institutions and documents cited in the programme + costing annex.
 // This site renders those documents; it did not independently audit them.
+// Source links. Every URL below was checked to resolve before being added.
+const DR = "https://commission.europa.eu/topics/eu-competitiveness/draghi-report_en";
+const OE = "https://www.oecd.org/en/topics/education-and-skills.html";
+const SG = "https://www.moe.gov.sg/primary/curriculum/syllabus";
+const FH = "https://www.fraunhofer.de/en.html";
+const GM = "https://www.oecd.org/en/topics/sub-issues/global-minimum-tax.html";
+const EG = "https://agriculture.gouv.fr/egalim-tout-savoir-sur-la-loi-agriculture-et-alimentation";
+const PA = "https://home-affairs.ec.europa.eu/policies/migration-and-asylum/pact-migration-and-asylum_en";
+const CB = "https://taxation-customs.ec.europa.eu/carbon-border-adjustment-mechanism_en";
+const CE = "https://www.conseil-etat.fr/";
+const HC = "https://www.hcfp.fr/";
+const OB = "https://www.ofb.gouv.fr/";
+const AN = "https://cyber.gouv.fr/";
+const FT = "https://www.francetravail.fr/";
+const MA = "https://www.systeme-de-design.gouv.fr/fondamentaux/typographie";
+
 const SOURCES = {
   fr: {
     btn: "Sources",
     groups: [
       { h: "Références citées dans le programme", items: [
-        "Rapport Draghi sur la compétitivité européenne (2024)",
-        "Comparaisons OCDE : dépense par élève, salaires des chercheurs, taux d'emploi",
-        "Méthode de Singapour pour l'enseignement explicite des mathématiques",
-        "Modèle des instituts Fraunhofer (Allemagne)",
-        "Impôt minimal mondial OCDE / G20",
-        "Loi Egalim ; pacte européen asile-migration ; mécanisme carbone aux frontières" ] },
+        { t: "Rapport Draghi sur la compétitivité européenne (2024)", u: DR },
+        { t: "Comparaisons OCDE : dépense par élève, salaires des chercheurs", u: OE },
+        { t: "Méthode de Singapour pour l'enseignement des mathématiques", u: SG },
+        { t: "Modèle des instituts Fraunhofer (Allemagne)", u: FH },
+        { t: "Impôt minimal mondial OCDE / G20", u: GM },
+        { t: "Loi Egalim", u: EG },
+        { t: "Pacte européen asile-migration", u: PA },
+        { t: "Mécanisme carbone aux frontières", u: CB } ] },
       { h: "Institutions de contrôle mobilisées", items: [
-        "Conseil d'État : comptabilité publique des normes",
-        "Haut Conseil des finances publiques : pouvoir d'alerte",
-        "Office français de la biodiversité ; ANSSI ; France Travail" ] },
+        { t: "Conseil d'État : comptabilité publique des normes", u: CE },
+        { t: "Haut Conseil des finances publiques : pouvoir d'alerte", u: HC },
+        { t: "Office français de la biodiversité : protection forte du territoire", u: OB },
+        { t: "ANSSI : standards de cybersécurité", u: AN },
+        { t: "France Travail : obligations de résultat par bassin d'emploi", u: FT } ] },
       { h: "Design", items: [
-        "Marianne, caractère typographique de l'État (DSFR)" ] }
+        { t: "Marianne, caractère typographique de l'État (DSFR)", u: MA } ] }
     ],
     note: "Ces références sont celles citées dans les documents du programme et son annexe de chiffrage. Ce site les restitue ; il ne les a pas auditées indépendamment. Les montants sont des estimations à horizon 2034, pas des prévisions."
   },
@@ -1017,18 +1047,22 @@ const SOURCES = {
     btn: "Sources",
     groups: [
       { h: "References cited in the programme", items: [
-        "Draghi report on European competitiveness (2024)",
-        "OECD comparisons: spending per pupil, researcher salaries, employment rate",
-        "The Singapore method for explicit mathematics teaching",
-        "The Fraunhofer institute model (Germany)",
-        "OECD / G20 global minimum tax",
-        "Egalim law; European asylum and migration pact; carbon border mechanism" ] },
+        { t: "Draghi report on European competitiveness (2024)", u: DR },
+        { t: "OECD comparisons: spending per pupil, researcher salaries", u: OE },
+        { t: "The Singapore method for mathematics teaching", u: SG },
+        { t: "The Fraunhofer institute model (Germany)", u: FH },
+        { t: "OECD / G20 global minimum tax", u: GM },
+        { t: "Egalim law", u: EG },
+        { t: "European asylum and migration pact", u: PA },
+        { t: "Carbon border mechanism", u: CB } ] },
       { h: "Oversight institutions relied on", items: [
-        "Conseil d'État : public ledger of norms",
-        "High Council of Public Finance : alert powers",
-        "French Biodiversity Agency; national cybersecurity agency; France Travail" ] },
+        { t: "Conseil d'État: public ledger of norms", u: CE },
+        { t: "High Council of Public Finance: alert powers", u: HC },
+        { t: "French Biodiversity Agency: strong territorial protection", u: OB },
+        { t: "ANSSI, the national cybersecurity agency: security standards", u: AN },
+        { t: "France Travail: binding results targets by employment area", u: FT } ] },
       { h: "Design", items: [
-        "Marianne, the French state typeface (DSFR)" ] }
+        { t: "Marianne, the French state typeface (DSFR)", u: MA } ] }
     ],
     note: "These references are the ones cited in the programme documents and its costing annex. This site renders them; it has not independently audited them. Figures are 2034 estimates, not forecasts."
   }
@@ -1315,7 +1349,8 @@ function applyLang(l) {
   document.getElementById("sBtn").textContent = S.btn;
   document.getElementById("sPop").innerHTML =
     S.groups.map(g => "<h4>" + g.h + "</h4><ul>" +
-      g.items.map(it => "<li>" + it + "</li>").join("") + "</ul>").join("") +
+      g.items.map(it => '<li><a href="' + it.u + '" target="_blank" rel="noopener noreferrer">' +
+        it.t + "</a></li>").join("") + "</ul>").join("") +
     '<p class="note">' + S.note + "</p>";
   tags.forEach((el, i) => { el.innerHTML = tagHTML(i); });
   if (sel !== null) { fillPanel(sel); cLabel.textContent = L(sel).title; }
