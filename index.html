@@ -812,7 +812,7 @@ function resize() {
   canvas.width = W * DPR; canvas.height = H * DPR;
   canvas.style.width = W + "px"; canvas.style.height = H + "px";
   ctx.setTransform(DPR, 0, 0, DPR, 0, 0);
-  CX = W / 2; CY = H * 0.58; // sphere sits lower, header breathes
+  CX = W / 2; CY = H / 2; // sphere stays centred
   R = Math.min(W, H) * 0.34;
 }
 window.addEventListener("resize", resize);
@@ -951,10 +951,9 @@ let sel = null;
 let anim = null; // {q0, q1, t0, dur}
 
 function rot(p) { return qapply(q, p); }
-let cyOff = 0; // sphere lifts while a pillar window is open
 function project(v, rad) {
   const s = F / (F - v.z * rad);
-  return { px: CX + v.x * rad * R * s, py: CY + cyOff - v.y * rad * R * s, s, z: v.z };
+  return { px: CX + v.x * rad * R * s, py: CY - v.y * rad * R * s, s, z: v.z };
 }
 
 // --- interaction ---
@@ -1046,10 +1045,6 @@ document.addEventListener("keydown", e => { if (e.key === "Escape") closePanel()
 
 // --- render loop ---
 function frame(now) {
-  // ease the sphere upward so the pillar window has room below it
-  const cyTarget = sel !== null ? -H * 0.17 : 0;
-  cyOff += (cyTarget - cyOff) * 0.08;
-
   if (anim) {
     const k = Math.min(1, (now - anim.t0) / anim.dur);
     const e = 1 - Math.pow(1 - k, 3);
