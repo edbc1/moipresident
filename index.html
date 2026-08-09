@@ -184,6 +184,18 @@
     white-space: nowrap;
   }
 
+  /* On mobile the counter moves below the sphere and the pillar window,
+     with the two gauges side by side to keep it shallow. */
+  @media (max-width: 720px) {
+    .counter {
+      top: auto; bottom: 62px; left: 36px; right: 36px; width: auto;
+      display: grid; grid-template-columns: 1fr 1fr; column-gap: 12px;
+    }
+    .counter .c-label { grid-column: 1 / -1; }
+    .counter .g-row { margin-top: 6px; }
+    .counter .gauge .g-max { font-size: 11px; padding-right: 9px; }
+  }
+
   /* context panel */
   /* pillar window, tethered below the clicked node */
   .panel {
@@ -779,6 +791,7 @@ const gainFill = document.getElementById("gainFill");
 const gMax = document.getElementById("gMax");
 const gGain = document.getElementById("gGain");
 const counterEl = document.getElementById("counter");
+let SAFE_BOTTOM = 0; // lowest y the sphere and the pillar window may use
 const TOTAL_GAIN = GAIN.reduce((a, b) => a + b, 0);
 
 let curVal = 0, curGain = 0, tweenId = 0;
@@ -824,7 +837,12 @@ function resize() {
   // +70 rather than +22: each tag floats ~40px above its own node, so the
   // painted top of the sphere sits well above R.
   const topEdge = (mh ? mh.getBoundingClientRect().bottom : 60) + 70;
-  const bottomEdge = H - 62;                 // clears the FR / Sources row
+  // below 720px the counter is docked at the bottom, so it, not the
+  // FR / Sources row, is what the sphere has to stay clear of
+  const cRect = counterEl.getBoundingClientRect();
+  const counterDocked = W <= 720 && cRect.height > 0;
+  SAFE_BOTTOM = counterDocked ? cRect.top - 12 : H - 62;
+  const bottomEdge = SAFE_BOTTOM;
   const band = Math.max(120, bottomEdge - topEdge);
   CX = W / 2;
   CY = topEdge + band / 2;
@@ -1130,7 +1148,8 @@ function frame(now) {
     let x = tagRect.left;                    // flush with the tag's left edge
     x = Math.max(M, Math.min(W - pw - M, x));
     let y = tagRect.bottom + 4;              // hang just under the tag
-    if (y + ph > H - M) y = Math.max(M, H - ph - M);
+    const yMax = Math.min(H - M, SAFE_BOTTOM);
+    if (y + ph > yMax) y = Math.max(M, yMax - ph);
     panelEl.style.transform = "translate(" + x.toFixed(1) + "px," + y.toFixed(1) + "px)";
   }
 
